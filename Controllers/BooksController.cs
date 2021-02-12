@@ -20,17 +20,35 @@ namespace LibraryWebApp.Controllers
         }
 
         // GET: Books
-        public async Task<IActionResult> Index(string searchTerm = null)
+        public async Task<IActionResult> Index(string searchTerm = null )
         {
+            ViewData["searchTerm"] = searchTerm;
+
             var model = await _context.Books
                 .Include(b => b.BookGenres)
                     .ThenInclude(bg => bg.Genre)
                 .AsNoTracking()
                 .OrderBy(b => b.Title)
                 .Where(b => searchTerm == null || b.Title.Contains(searchTerm) || b.OgTitle.Contains(searchTerm))
+                
                 .ToListAsync();
             return View(model);
         }
+
+        /*// GET: Books
+        [HttpGet("{genre}")]
+        public async Task<IActionResult> GetBooksByGenre(string genre = null)
+        {
+            var model = await _context.BooksGenres
+                .Include(b => b.Genre)
+                .AsNoTracking()
+                .Where(b => genre == null || b.Genre.Name.Equals(genre))
+
+                .ToListAsync();
+            return View("Index", model);
+        }*/
+
+
 
         // GET: Books/Details/5
         public async Task<IActionResult> Details(long? id)
@@ -41,6 +59,9 @@ namespace LibraryWebApp.Controllers
             }
 
             var book = await _context.Books
+                .Include(b => b.BookGenres)
+                    .ThenInclude(bg => bg.Genre)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (book == null)
             {
