@@ -1,4 +1,5 @@
-﻿using LibraryWebApp.Data;
+﻿
+using LibraryWebApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -16,6 +17,21 @@ namespace LibraryWebApp.Models
                 serviceProvider.GetRequiredService<
                     DbContextOptions<LibraryAppDBContext>>()))
             {
+                ///////////////////// GENRES /////////////////////////
+
+                // Look for any Genres.
+                if (context.Genres.Any())
+                {
+                    return;   // DB has been seeded
+                }
+
+                // Seed Genres Table
+                var intuition = new Genre { Name = "Intuição" };
+                var personalDevelopment = new Genre { Name = "Desenvolvimento Pessoal" };
+                var creativity = new Genre { Name = "Criatividade" };
+                context.Genres.AddRange(intuition, personalDevelopment, creativity);
+                context.SaveChanges();
+
 
                 ////////////////// BOOKS //////////////////////
 
@@ -27,33 +43,52 @@ namespace LibraryWebApp.Models
 
 
                 // Seed Books Table
-                var books = new Book[]
+                var blink_gladwell = new Book
                 {
-                    new Book(){
                     Title = "Decidir num piscar de olhos",
                     OgTitle = "Blink!",
                     PublicationYear = 2009,
                     Edition = 4,
-                    PhysicalDescription = "263 p. ; 24 cm"
-                    },
+                    PhysicalDescription = "263 p. ; 24 cm",
+                };
 
-                    new Book(){
+                var intuition_osho = new Book
+                {
                     Title = "Intuição",
                     OgTitle = "Intuition: knowing beyond logic",
                     PublicationYear = 2006,
-                    PhysicalDescription = "196 p. ; 22 cm"
-                    },
-
-                    new Book(){
-                    Title = "Criatividade : libertar as forças interiores",
-                    PublicationYear = 2006,
-                    PhysicalDescription = "196 p. ; 22 cm"
-                    }
+                    PhysicalDescription = "196 p. ; 22 cm",
                 };
 
-                foreach (Book book in books)
+                var creativity_osho = new Book
                 {
-                    context.Books.Add(book);
+                    Title = "Criatividade : libertar as forças interiores",
+                    PublicationYear = 2006
+                };
+
+                context.Books.AddRange(blink_gladwell, intuition_osho, creativity_osho);
+                context.SaveChanges();
+
+
+                ////////// SEED BOOKSGENRES /////////////
+
+                // Look for any Books.
+                if (context.BooksGenres.Any())
+                {
+                    return;   // DB has been seeded
+                }
+
+                var booksGenres = new BooksGenres[]
+                {
+                new BooksGenres { BookId = blink_gladwell.Id, GenreId = intuition.Id },
+                new BooksGenres { BookId = intuition_osho.Id, GenreId = personalDevelopment.Id },
+                new BooksGenres { BookId = intuition_osho.Id, GenreId = creativity.Id },
+                new BooksGenres { BookId = creativity_osho.Id, GenreId = creativity.Id }
+                };
+
+                foreach (BooksGenres bookGenres in booksGenres)
+                {
+                    context.BooksGenres.Add(bookGenres);
                 }
                 context.SaveChanges();
             }

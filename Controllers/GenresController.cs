@@ -10,29 +10,22 @@ using LibraryWebApp.Models;
 
 namespace LibraryWebApp.Controllers
 {
-    public class BooksController : Controller
+    public class GenresController : Controller
     {
         private readonly LibraryAppDBContext _context;
 
-        public BooksController(LibraryAppDBContext context)
+        public GenresController(LibraryAppDBContext context)
         {
             _context = context;
         }
 
-        // GET: Books
-        public async Task<IActionResult> Index(string searchTerm = null)
+        // GET: Genres
+        public async Task<IActionResult> Index()
         {
-            var model = await _context.Books
-                .Include(b => b.BookGenres)
-                    .ThenInclude(bg => bg.Genre)
-                .AsNoTracking()
-                .OrderBy(b => b.Title)
-                .Where(b => searchTerm == null || b.Title.Contains(searchTerm) || b.OgTitle.Contains(searchTerm))
-                .ToListAsync();
-            return View(model);
+            return View(await _context.Genres.ToListAsync());
         }
 
-        // GET: Books/Details/5
+        // GET: Genres/Details/5
         public async Task<IActionResult> Details(long? id)
         {
             if (id == null)
@@ -40,39 +33,39 @@ namespace LibraryWebApp.Controllers
                 return NotFound();
             }
 
-            var book = await _context.Books
+            var genre = await _context.Genres
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (book == null)
+            if (genre == null)
             {
                 return NotFound();
             }
 
-            return View(book);
+            return View(genre);
         }
 
-        // GET: Books/Create
+        // GET: Genres/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Books/Create
+        // POST: Genres/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,OgTitle,PublicationYear,Edition,Notes,PhysicalDescription")] Book book)
+        public async Task<IActionResult> Create([Bind("Id,Name")] Genre genre)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(book);
+                _context.Add(genre);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(book);
+            return View(genre);
         }
 
-        // GET: Books/Edit/5
+        // GET: Genres/Edit/5
         public async Task<IActionResult> Edit(long? id)
         {
             if (id == null)
@@ -80,22 +73,22 @@ namespace LibraryWebApp.Controllers
                 return NotFound();
             }
 
-            var book = await _context.Books.FindAsync(id);
-            if (book == null)
+            var genre = await _context.Genres.FindAsync(id);
+            if (genre == null)
             {
                 return NotFound();
             }
-            return View(book);
+            return View(genre);
         }
 
-        // POST: Books/Edit/5
+        // POST: Genres/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(long id, [Bind("Id,Title,OgTitle,PublicationYear,Edition,Notes,PhysicalDescription")] Book book)
+        public async Task<IActionResult> Edit(long id, [Bind("Id,Name")] Genre genre)
         {
-            if (id != book.Id)
+            if (id != genre.Id)
             {
                 return NotFound();
             }
@@ -104,12 +97,12 @@ namespace LibraryWebApp.Controllers
             {
                 try
                 {
-                    _context.Update(book);
+                    _context.Update(genre);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!BookExists(book.Id))
+                    if (!GenreExists(genre.Id))
                     {
                         return NotFound();
                     }
@@ -120,10 +113,10 @@ namespace LibraryWebApp.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(book);
+            return View(genre);
         }
 
-        // GET: Books/Delete/5
+        // GET: Genres/Delete/5
         public async Task<IActionResult> Delete(long? id)
         {
             if (id == null)
@@ -131,30 +124,30 @@ namespace LibraryWebApp.Controllers
                 return NotFound();
             }
 
-            var book = await _context.Books
+            var genre = await _context.Genres
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (book == null)
+            if (genre == null)
             {
                 return NotFound();
             }
 
-            return View(book);
+            return View(genre);
         }
 
-        // POST: Books/Delete/5
+        // POST: Genres/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(long id)
         {
-            var book = await _context.Books.FindAsync(id);
-            _context.Books.Remove(book);
+            var genre = await _context.Genres.FindAsync(id);
+            _context.Genres.Remove(genre);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool BookExists(long id)
+        private bool GenreExists(long id)
         {
-            return _context.Books.Any(e => e.Id == id);
+            return _context.Genres.Any(e => e.Id == id);
         }
     }
 }

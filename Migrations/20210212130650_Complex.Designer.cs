@@ -4,14 +4,16 @@ using LibraryWebApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace LibraryWebApp.Migrations
 {
     [DbContext(typeof(LibraryAppDBContext))]
-    partial class LibraryAppDBContextModelSnapshot : ModelSnapshot
+    [Migration("20210212130650_Complex")]
+    partial class Complex
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

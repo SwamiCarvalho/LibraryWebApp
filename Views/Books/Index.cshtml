@@ -6,6 +6,12 @@
 
 <h1>Index</h1>
 
+<form method="get">
+    <input type="search" name="searchTerm" />
+    <input type="submit" value="Search" />
+    <a asp-action="Index">Clear Search</a>
+</form>
+
 <p>
     <a asp-action="Create">Create New</a>
 </p>
@@ -29,6 +35,9 @@
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.PhysicalDescription)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.BookGenres)
             </th>
             <th></th>
         </tr>
@@ -55,11 +64,20 @@
                 @Html.DisplayFor(modelItem => item.PhysicalDescription)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                @foreach (var genreItem in item.BookGenres)
+                {
+
+                    @Html.DisplayFor(modelItem => genreItem.Genre.Name)
+
+                }
             </td>
-        </tr>
+
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
 }
     </tbody>
 </table>

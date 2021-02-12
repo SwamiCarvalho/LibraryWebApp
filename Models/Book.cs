@@ -24,5 +24,7 @@ namespace LibraryWebApp.Models
         [DisplayName("Physical Description")]
         public string? PhysicalDescription { get; set; }
 
+        public virtual ICollection<BooksGenres> BookGenres { get; set; }
+
     }
 }
