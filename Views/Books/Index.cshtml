@@ -30,53 +30,53 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Title)
+                @Html.DisplayNameFor(books => books.Title)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.OgTitle)
+                @Html.DisplayNameFor(books => books.OgTitle)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.PublicationYear)
+                @Html.DisplayNameFor(books => books.PublicationYear)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Edition)
+                @Html.DisplayNameFor(books => books.Edition)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Notes)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.PhysicalDescription)
+                @Html.DisplayNameFor(books => books.PhysicalDescription)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.BookGenres)
+                @Html.DisplayNameFor(books => books.BookGenres)
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
+        @foreach (var book in Model)
         {
             <tr>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Title)
+                    @Html.DisplayFor(modelItem => book.Title)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.OgTitle)
+                    @Html.DisplayFor(modelItem => book.OgTitle)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.PublicationYear)
+                    @Html.DisplayFor(modelItem => book.PublicationYear)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Edition)
+                    @Html.DisplayFor(modelItem => book.Edition)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Notes)
+                    @Html.DisplayFor(modelItem => book.Notes)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.PhysicalDescription)
+                    @Html.DisplayFor(modelItem => book.PhysicalDescription)
                 </td>
                 <td>
-                    @foreach (var genreItem in item.BookGenres)
+                    @foreach (var genreItem in book.BookGenres)
                     {
 
                         @Html.DisplayFor(modelItem => genreItem.Genre.Name)
@@ -85,9 +85,9 @@
                 </td>
 
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    <a asp-action="Edit" asp-route-id="@book.Id">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@book.Id">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@book.Id">Delete</a>
                 </td>
             </tr>
         }
