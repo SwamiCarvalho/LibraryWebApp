@@ -8,6 +8,7 @@ namespace LibraryWebApp.Models
 {
     public class BooksGenres
     {
+
         [ForeignKey("BookId")]
         public long BookId { get; set; }
         [ForeignKey("GenreId")]
