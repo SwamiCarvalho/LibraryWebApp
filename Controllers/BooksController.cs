@@ -6,36 +6,61 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using LibraryWebApp.Data;
-using LibraryWebApp.Models;
+using LibraryAPI.Models;
+using System.Net.Http;
+using Newtonsoft.Json;
+using System.Net.Http.Headers;
 
 namespace LibraryWebApp.Controllers
 {
     public class BooksController : Controller
     {
-        private readonly LibraryAppDBContext _context;
+        /*private readonly LibraryAppDBContext _context;
 
         public BooksController(LibraryAppDBContext context)
         {
             _context = context;
-        }
+        }*/
+
+        //Hosted web API REST Service base url  
+        string Baseurl = "https://localhost:44351/";
 
         // GET: Books
-        public async Task<IActionResult> Index(string searchTerm = null)
+        public async Task<IActionResult> Index(string searchTerm = null, string genre = null, string author = null)
         {
+            List<Book> model = new List<Book>();
             ViewData["searchTerm"] = searchTerm;
+            ViewData["genreFilter"] = genre;
+            ViewData["authorFilter"] = author;
 
-            var model = await _context.Books
-                .Include(b => b.BookGenres)
-                    .ThenInclude(bg => bg.Genre)
-                .AsNoTracking()
-                .OrderBy(b => b.Title)
-                .Where(b => searchTerm == null || b.Title.Contains(searchTerm) || b.OgTitle.Contains(searchTerm))
+            using (var client = new HttpClient())
+            {
+                //Passing service base url  
+                client.BaseAddress = new Uri(Baseurl);
 
-                .ToListAsync();
-            return View(model);
+                client.DefaultRequestHeaders.Clear();
+                //Define request data format  
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                //Sending request to find web api REST service resource GetAllEmployees using HttpClient  
+                HttpResponseMessage Res = await client.GetAsync("api/Books");
+
+                //Checking the response is successful or not which is sent using HttpClient  
+                if (Res.IsSuccessStatusCode)
+                {
+                    //Storing the response details recieved from web api   
+                    var EmpResponse = Res.Content.ReadAsStringAsync().Result;
+
+                    //Deserializing the response recieved from web api and storing into the Employee list  
+                    model = JsonConvert.DeserializeObject<List<Book>>(EmpResponse);
+
+                }
+                //returning the employee list to view 
+                return View(model);
+            }
         }
 
-        // GET: Books/Details/5
+        /*// GET: Books/Details/5
         public async Task<IActionResult> Details(long? id)
         {
             if (id == null)
@@ -162,5 +187,5 @@ namespace LibraryWebApp.Controllers
         {
             return _context.Books.Any(e => e.Id == id);
         }
-    }
+    }*/
 }

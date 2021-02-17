@@ -1,9 +1,10 @@
-﻿@model IEnumerable<LibraryWebApp.Models.Book>
+﻿@model IEnumerable<LibraryAPI.Models.Book>
 
 
 @{
     ViewData["Title"] = "Books";
     var genreFilter = ViewData["genreFilter"];
+    var authorFilter = ViewData["authorFilter"];
 }
 
 <h1>Index</h1>
