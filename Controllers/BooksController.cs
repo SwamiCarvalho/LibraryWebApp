@@ -186,6 +186,6 @@ namespace LibraryWebApp.Controllers
         private bool BookExists(long id)
         {
             return _context.Books.Any(e => e.Id == id);
-        }
-    }*/
+        }*/
+    }
 }
