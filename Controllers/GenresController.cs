@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using LibraryWebApp.Data;
 using LibraryWebApp.Models;
+using LibraryAPI.Models;
 
 namespace LibraryWebApp.Controllers
 {
