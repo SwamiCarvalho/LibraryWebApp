@@ -1,17 +1,25 @@
 using LibraryWebApp;
+using LibraryWebApp.Interfaces;
 using LibraryWebApp.Models;
+using LibraryWebApp.Services;
+using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Threading.Tasks;
 
 namespace LibraryWebApp
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
+
+
             var host = CreateHostBuilder(args).Build();
 
             using (var scope = host.Services.CreateScope())
@@ -29,7 +37,7 @@ namespace LibraryWebApp
                 }
             }
 
-            host.Run();
+            await host.RunAsync();
 
         }
 

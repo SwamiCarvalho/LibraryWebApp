@@ -1,4 +1,6 @@
 using LibraryWebApp.Data;
+using LibraryWebApp.Interfaces;
+using LibraryWebApp.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -9,6 +11,7 @@ using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
 namespace LibraryWebApp
@@ -29,6 +32,16 @@ namespace LibraryWebApp
 
             services.AddDbContext<LibraryAppDBContext>(options =>
                                                 options.UseSqlServer(Configuration["ConnectionString:LibraryAppDB"]));
+
+            //services.AddScoped<IBooksServices, BooksServices>();
+            /*services.AddHttpClient();
+            services.AddHttpClient("meta", c =>
+            {
+                c.BaseAddress = new Uri(Configuration.GetValue<string>("MetaAPI"));
+                c.DefaultRequestHeaders.Accept.Clear();
+                c.DefaultRequestHeaders.Accept.Add(
+                    new MediaTypeWithQualityHeaderValue("application/json"));
+            });*/
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

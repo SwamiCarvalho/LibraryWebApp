@@ -47,10 +47,10 @@
             @Html.DisplayFor(model => model.PhysicalDescription)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.BookGenres)
+            @Html.DisplayNameFor(model => model.BooksGenres)
         </dt>
         <dd class = "col-sm-10">
-            @foreach (var genreItem in Model.BookGenres)
+            @foreach (var genreItem in Model.BooksGenres)
             {
                 @Html.DisplayFor(model => genreItem.Genre.Name)
             }

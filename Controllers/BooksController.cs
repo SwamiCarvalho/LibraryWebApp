@@ -1,16 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using LibraryWebApp.Data;
+﻿using Microsoft.AspNetCore.Mvc;
 using LibraryAPI.Models;
-using System.Net.Http;
-using Newtonsoft.Json;
-using System.Net.Http.Headers;
-using LibraryAPI.DTOs;
+using LibraryWebApp.Interfaces;
 
 namespace LibraryWebApp.Controllers
 {
@@ -23,230 +13,75 @@ namespace LibraryWebApp.Controllers
             _context = context;
         }*/
 
-        // HttpClient is intended to be instantiated once per application, rather than per-use.
-        static readonly HttpClient client = new HttpClient();
+        private IBooksServices _services;
 
-        //Hosted web API REST Service base url  
-        string Baseurl = "https://localhost:44351/";
+        public BooksController(IBooksServices services)
+        {
+            _services = services;
+        }
 
         // GET: Books
-        public async Task<IActionResult> Index(string? searchTerm = null, string? genre = null, string? author = null)
+        public IActionResult Index([FromQuery] string searchTerm, [FromQuery] string genre, [FromQuery] string author)
         {
-            List<BookDTO> model = new List<BookDTO>();
             ViewData["searchTerm"] = searchTerm;
             ViewData["genreFilter"] = genre;
             ViewData["authorFilter"] = author;
 
+            var books = _services.GetBooksAsync();
 
-            try
-            {
-                //Passing service base url  
-                client.BaseAddress = new Uri(Baseurl);
-
-                //Define request data format  
-                //client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-                //Sending request to find web api REST service resource GetAllBooks using HttpClient  
-                HttpResponseMessage Res = await client.GetAsync("api/Books");
-
-                //Checking the response is successful or not which is sent using HttpClient  
-                if (Res.IsSuccessStatusCode)
-                {
-                    //Storing the response details recieved from web api   
-                    var BooksResponse = Res.Content.ReadAsStringAsync().Result;
-
-                    //Deserializing the response recieved from web api and storing into the Employee list  
-                    model = JsonConvert.DeserializeObject<List<BookDTO>>(BooksResponse);
-
-                }
-                //returning the employee list to view 
-                return View(model);
-            }
-            catch (HttpRequestException e)
-            {
-                Console.WriteLine("\nException Caught!");
-                Console.WriteLine("Message :{0} ", e.Message);
-                var msg = "Something is Wrong";
-                return View(msg, e.Message);
-            }
+            return View(books);
+        
         }
 
         // GET: Books/Details/5
-        public async Task<IActionResult> Details()
+        public IActionResult Details([FromRoute] long id)
         {
-            BookDTO model = new BookDTO();
-            try
-            {
-                client.BaseAddress = new Uri(Baseurl);
+            var book = _services.GetBookByIdAsync(id);
 
-
-                HttpResponseMessage res = await client.GetAsync("api/Books/{id}");
-
-                if (res.IsSuccessStatusCode)
-                {
-                    var BookResponse = res.Content.ReadAsStringAsync().Result;
-
-                    model = JsonConvert.DeserializeObject<BookDTO>(BookResponse);
-
-                }
-                return View(model);
-
-            }
-            catch (HttpRequestException e)
-            {
-                Console.WriteLine("\nException Caught!");
-                Console.WriteLine("Message :{0} ", e.Message);
-                var msg = "Something is Wrong";
-                return View(msg, e.Message);
-
-            }
+            return View(book);
         }
 
 
         // POST: Books/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,OgTitle,PublicationYear,Edition,Notes,PhysicalDescription")] Book book)
+
+        public IActionResult Create([FromBody] Book book)
         {
-            try
-            {
-                client.BaseAddress = new Uri(Baseurl);
-                if (ModelState.IsValid)
-                {
-                    HttpResponseMessage res = await client.GetAsync("api/Books");
-
-                    //_context.Add(book);
-                    //await _context.SaveChangesAsync();
-                    return RedirectToAction(nameof(Index));
-                }
-                return View(book);
-            }
-            catch (HttpRequestException e)
-            {
-                Console.WriteLine("\nException Caught!");
-                Console.WriteLine("Message :{0} ", e.Message);
-                var msg = "Something is Wrong";
-                return View(msg, e.Message);
-            }
-
+            var newBook = _services.CreateBookAsync(book);
+            return CreatedAtAction("Details", new { id = newBook.Id }, newBook);
         }
 
-        // Put: Books/Edit/5
-        [HttpPut]
-        public async Task<IActionResult> Edit()
+
+        public IActionResult Edit([FromRoute] long id)
         {
-            BookDTO model = new BookDTO();
-            try
-            {
-                client.BaseAddress = new Uri(Baseurl);
-
-                HttpResponseMessage res = await client.GetAsync("api/Books/{id}");
-
-                if (res.IsSuccessStatusCode)
-                {
-                    var BookResponse = res.Content.ReadAsStringAsync().Result;
-                    model = JsonConvert.DeserializeObject<BookDTO>(BookResponse);
-                }
-                return View(model);
-            }
-            catch (HttpRequestException e)
-            {
-                Console.WriteLine("\nException Caught!");
-                Console.WriteLine("Message :{0} ", e.Message);
-                var msg = "Something is Wrong";
-                return View(msg);
-            }
+            var book = _services.GetBookByIdAsync(id);
+            return View(book);
         }
 
-        // POST: Genres/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(long id, [Bind("Id,Title,OgTitle,PublicationYear,Edition,Notes,PhysicalDescription")] Book book)
+
+        // Post Updated Book
+        // POST 
+        public IActionResult Update([FromRoute] long id, [Bind("Id,Title,OgTitle,PublicationYear,Edition,Notes,PhysicalDescription")] Book book)
         {
-            BookDTO model = new BookDTO();
-
-
-            try
-            {
-                client.BaseAddress = new Uri(Baseurl);
-
-                HttpResponseMessage res = await client.GetAsync("api/Books/{id}");
-
-                if (res.IsSuccessStatusCode)
-                {
-                    var BookResponse = res.Content.ReadAsStringAsync().Result;
-                    model = JsonConvert.DeserializeObject<BookDTO>(BookResponse);
-                }
-                return RedirectToAction(nameof(Details));
-            }
-            catch (HttpRequestException e)
-            {
-                Console.WriteLine("\nException Caught!");
-                Console.WriteLine("Message :{0} ", e.Message);
-                var msg = "Something is Wrong";
-                return View(msg);
-            }
-            
+            var updatedBook = _services.UpdateBookAsync(book);
+            return CreatedAtAction("Details", new { id = updatedBook.Id }, updatedBook);
         }
-            
     
 
         // GET: Books/Delete/5
-        [HttpDelete]
-        public async Task<IActionResult> Delete(long? id)
+        public IActionResult Delete([FromRoute]long id)
         {
-            try
-            {
-                client.BaseAddress = new Uri(Baseurl);
-
-                HttpResponseMessage res = await client.GetAsync("api/Books/{id}");
-
-                if (res.IsSuccessStatusCode)
-                {
-                    var BookResponse = res.Content.ReadAsStringAsync().Result;
-                }
-                return RedirectToAction(nameof(Details));
-            }
-            catch (HttpRequestException e)
-            {
-                Console.WriteLine("\nException Caught!");
-                Console.WriteLine("Message :{0} ", e.Message);
-                var msg = "Something is Wrong";
-                return View(msg);
-            }
+            var deletedBook = _services.DeleteBookAsync(id);
+            return RedirectToAction(nameof(Index));
         }
 
-        // POST: Books/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(long id)
+        /*// POST: Books/Delete/5
+        public IActionResult DeleteConfirmed([FromRoute] long id)
         {
-            try
-            {
-                client.BaseAddress = new Uri(Baseurl);
-                HttpResponseMessage res = await client.GetAsync("api/Books/{id}");
+            var deletedBook = _services.DeleteBookConfirmed(id);
+            return RedirectToAction(nameof(Index));
+        }*/
 
-                if (res.IsSuccessStatusCode)
-                {
-                    var BookResponse = res.Content.ReadAsStringAsync().Result;
-                }
-                return View();
-            }
-            catch (HttpRequestException e)
-            {
-                Console.WriteLine("\nException Caught!");
-                Console.WriteLine("Message :{0} ", e.Message);
-                var msg = "Something is Wrong";
-                return View(msg);
-            }
-            //var book = await _context.Books.FindAsync(id);
-            //_context.Books.Remove(book);
-            //await _context.SaveChangesAsync();
-            //return RedirectToAction(nameof(Index));
-        }
     }
 }

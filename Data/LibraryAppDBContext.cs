@@ -1,4 +1,5 @@
-﻿using LibraryWebApp.Models;
+﻿using LibraryAPI.Models;
+using LibraryWebApp.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace LibraryWebApp.Data

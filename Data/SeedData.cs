@@ -17,7 +17,7 @@ namespace LibraryWebApp.Models
                 serviceProvider.GetRequiredService<
                     DbContextOptions<LibraryAppDBContext>>()))
             {
-                ///////////////////// GENRES /////////////////////////
+                /*///////////////////// GENRES /////////////////////////
 
                 // Look for any Genres.
                 if (context.Genres.Any())
@@ -90,7 +90,7 @@ namespace LibraryWebApp.Models
                 {
                     context.BooksGenres.Add(bookGenres);
                 }
-                context.SaveChanges();
+                context.SaveChanges();*/
             }
         }
     }
