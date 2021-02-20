@@ -1,23 +1,19 @@
 using LibraryWebApp.Data;
-using LibraryWebApp.Interfaces;
-using LibraryWebApp.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Threading.Tasks;
 
 namespace LibraryWebApp
 {
     public class Startup
     {
+        static HttpClient client = new HttpClient();
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -28,12 +24,20 @@ namespace LibraryWebApp
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // Update port # in the following line.
+            client.BaseAddress = new Uri("http://localhost:64195/");
+            client.DefaultRequestHeaders.Accept.Clear();
+            client.DefaultRequestHeaders.Accept.Add(
+                new MediaTypeWithQualityHeaderValue("application/json"));
+            services.AddHttpClient();
+
             services.AddControllersWithViews();
 
             services.AddDbContext<LibraryAppDBContext>(options =>
                                                 options.UseSqlServer(Configuration["ConnectionString:LibraryAppDB"]));
 
             //services.AddScoped<IBooksServices, BooksServices>();
+            
             /*services.AddHttpClient();
             services.AddHttpClient("meta", c =>
             {

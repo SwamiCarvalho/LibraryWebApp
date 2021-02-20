@@ -1,4 +1,4 @@
-﻿@model IEnumerable<LibraryAPI.Models.Genre>
+﻿@model List<LibraryAPI.Models.DTOs.GenreDTO>
 
 @{
     ViewData["Title"] = "Genres";
@@ -13,9 +13,9 @@
 <ul>
     @foreach (var item in Model)
     {
-        <li>
-            <a asp-action="Index" asp-route-genre="@item.Name"> @Html.DisplayFor(modelItem => item.Name)</a>
-            <a asp-action="Edit" asp-route-id="@item.Id">Edit</a>
-        </li>
+    <li>
+        <a asp-action="Details" asp-route-id="@item.Id"> @Html.DisplayFor(modelItem => item.Name)</a>
+        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+    </li>
     }
 </ul>
