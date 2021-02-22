@@ -1,4 +1,4 @@
-﻿@model LibraryAPI.Models.Book
+﻿@model LibraryAPI.Models.DTOs.BookDetailsDTO
 
 @{
     ViewData["Title"] = "Details";
@@ -10,51 +10,60 @@
     <h4>Book</h4>
     <hr />
     <dl class="row">
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Title)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Title)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.OgTitle)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.OgTitle)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.PublicationYear)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.PublicationYear)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Edition)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Edition)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Notes)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Notes)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.PhysicalDescription)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.PhysicalDescription)
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.BooksGenres)
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Genres)
         </dt>
-        <dd class = "col-sm-10">
-            @foreach (var genreItem in Model.BooksGenres)
+        <dd class="col-sm-10">
+            @foreach (var genreItem in Model.Genres)
             {
-                @Html.DisplayFor(model => genreItem.Genre.Name)
+                @Html.DisplayFor(model => genreItem.Name)
             }
-            
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Authors)
+        </dt>
+        <dd class="col-sm-10">
+            @foreach (var authorItem in Model.Authors)
+             {
+                <a asp-controller="Authors" asp-action="Details" asp-route-id="@authorItem.Id">@Html.DisplayFor(model => authorItem.FullName)</a>
+             }
+
         </dd>
     </dl>
 </div>

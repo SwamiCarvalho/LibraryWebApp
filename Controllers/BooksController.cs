@@ -59,13 +59,13 @@ namespace LibraryWebApp.Controllers
         // GET: Books/Details/5
         public async Task<IActionResult> Details([FromRoute] long id)
         {
-            Book book = new Book();
+            BookDetailsDTO book = new BookDetailsDTO();
 
             HttpResponseMessage res = await _client.GetAsync(baseurl + $"Books/{id}");
 
             if (res.IsSuccessStatusCode)
             {
-                book = await res.Content.ReadAsAsync<Book>();
+                book = await res.Content.ReadAsAsync<BookDetailsDTO>();
             }
             return View(book);
         }
@@ -82,13 +82,13 @@ namespace LibraryWebApp.Controllers
         }
 
 
-        public async Task<Uri> Add([FromBody] Book book)
+        public async Task<IActionResult> Add([FromBody] Book book)
         {
             HttpResponseMessage res = await _client.PostAsJsonAsync(baseurl + "Books", book);
 
             res.EnsureSuccessStatusCode();
 
-            return res.Headers.Location;
+            return View("Details", book.Id);
         }
 
 
@@ -113,14 +113,25 @@ namespace LibraryWebApp.Controllers
         // POST 
         public async Task<IActionResult> Update([FromRoute] long id, [Bind("Id,Title,OgTitle,PublicationYear,Edition,Notes,PhysicalDescription")] Book book)
         {
-            HttpResponseMessage res = await _client.PutAsJsonAsync(baseurl + $"Books/{book.Id}", book);
+            if(id != book.Id)
+            {
+                return NotFound();
+            }
+
+            HttpResponseMessage res = await _client.PutAsJsonAsync(baseurl + $"Books/{id}", book);
 
             res.EnsureSuccessStatusCode();
 
-            // Deserialize the updated product from the response body.
-            book = await res.Content.ReadAsAsync<Book>();
+            if (res.IsSuccessStatusCode)
+            {
+                return View("Details", id);
+            }
 
-            return View("Details", book.Id);
+
+            // Deserialize the updated product from the response body.
+            //book = await res.Content.ReadAsAsync<Book>();
+            return CreatedAtAction(nameof(Details), id);
+            
         }
     
 

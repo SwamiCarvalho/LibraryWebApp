@@ -1,7 +1,7 @@
-﻿@model List<LibraryAPI.Models.Genre>
+﻿@model List<LibraryAPI.Models.Author>
 
 @{
-    ViewData["Title"] = "Genres";
+    ViewData["Title"] = "Authors";
 }
 
 <h1>@ViewData["Title"]</h1>
@@ -14,7 +14,7 @@
     @foreach (var item in Model)
     {
     <li>
-        <a asp-action="Details" asp-route-id="@item.Id"> @Html.DisplayFor(modelItem => item.Name)</a>
+        <a asp-action="Details" asp-route-id="@item.Id"> @Html.DisplayFor(modelItem => item.FullName)</a>
         <a asp-action="Edit" asp-route-id="@item.Id">Edit</a>
     </li>
     }

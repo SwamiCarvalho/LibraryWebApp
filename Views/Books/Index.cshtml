@@ -1,5 +1,4 @@
-﻿@model List<LibraryAPI.Models.DTOs.BookDTO>
-
+﻿@model IEnumerable<LibraryAPI.Models.DTOs.BookDTO>
 
 @{
     ViewData["Title"] = "Books";
@@ -43,6 +42,12 @@
                 @Html.DisplayNameFor(books => books.Edition)
             </th>
             <th>
+                @Html.DisplayNameFor(books => books.Genres)
+            </th>
+            <th>
+                @Html.DisplayNameFor(books => books.Authors)
+            </th>
+            <th>
 
             <th></th>
         </tr>
@@ -50,42 +55,42 @@
     <tbody>
         @foreach (var book in Model)
         {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => book.Title)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => book.OgTitle)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => book.PublicationYear)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => book.Edition)
-            </td>
-            <td>
-                @foreach (var genreItem in book.Genres)
-                {
+            <tr>
+                <td>
+                    <a asp-action="Details" asp-route-id="@book.Id">@Html.DisplayFor(modelItem => book.Title)</a>
+</td>
+                <td>
+                    @Html.DisplayFor(modelItem => book.OgTitle)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => book.PublicationYear)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => book.Edition)
+                </td>
+                <td>
+                    @foreach (var genreItem in book.Genres)
+                    {
 
-                    @Html.DisplayFor(modelItem => genreItem.Name)
+                        @Html.DisplayFor(modelItem => genreItem.Name)
 
-                }
-            </td>
-            <td>
-                @foreach (var genreItem in book.Authors)
-                {
+                    }
+                </td>
+                <td>
+                    @foreach (var genreItem in book.Authors)
+                    {
 
-                    @Html.DisplayFor(modelItem => genreItem.FullName)
+                        @Html.DisplayFor(modelItem => genreItem.FullName)
 
-                }
-            </td>
+                    }
+                </td>
 
-            <td>
-                <a asp-action="Edit" asp-route-id="@book.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@book.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@book.Id">Delete</a>
-            </td>
-        </tr>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@book.Id">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@book.Id">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@book.Id">Delete</a>
+                </td>
+            </tr>
         }
     </tbody>
 </table>

@@ -3,14 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using LibraryWebApp.Data;
 using LibraryWebApp.Models;
 using LibraryAPI.Models;
 using System.Net.Http;
-using LibraryAPI.Models.DTOs;
-using System.Net.Http.Headers;
 using System.Net;
 
 namespace LibraryWebApp.Controllers
@@ -31,7 +26,7 @@ namespace LibraryWebApp.Controllers
         // GET: Genres
         public async Task<IActionResult> Index()
         {
-            List<GenreDTO> genres = new List<GenreDTO>();
+            List<Genre> genres = new List<Genre>();
             genres = null;
 
             //Sending request to find web api REST service resource GetAllGenres using HttpClient  
@@ -41,7 +36,7 @@ namespace LibraryWebApp.Controllers
             if (Res.IsSuccessStatusCode)
             {
                 //Storing the response details recieved from web api   
-                genres = await Res.Content.ReadAsAsync<List<GenreDTO>>();
+                genres = await Res.Content.ReadAsAsync<List<Genre>>();
 
             }
             //returning the genres list to view controller
@@ -93,24 +88,28 @@ namespace LibraryWebApp.Controllers
             {
                 // Deserialize the updated product from the response body.
                 genre = await res.Content.ReadAsAsync<Genre>();
+                return View(genre);
             }
-            return View(genre);
+            return View(new ErrorViewModel());
         }
 
 
         // POST: Genres/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        public async Task<IActionResult> Update([FromRoute]long id, [Bind("Id,Name")] Genre genre)
+        public async Task<IActionResult> Update([Bind("Id,Name")] Genre genre)
         {
             HttpResponseMessage res = await _client.PutAsJsonAsync(baseurl + $"Genres/{genre.Id}", genre);
 
-            res.EnsureSuccessStatusCode();
-
-            // Deserialize the updated product from the response body.
-            var updateGenre = await res.Content.ReadAsAsync<Genre>();
-
-            return CreatedAtAction("Details", updateGenre.Id);
+            if (res.IsSuccessStatusCode)
+            {
+                var updateGenre = await res.Content.ReadAsAsync<Genre>();
+                return View("Details", updateGenre.Id);
+            }
+            // Deserialize the updated genre from the response body.
+            
+            return View("Edit", genre.Id);
+            
         }
 
         // GET: Genres/Delete/5
