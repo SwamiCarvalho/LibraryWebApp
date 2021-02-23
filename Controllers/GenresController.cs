@@ -7,6 +7,8 @@ using LibraryWebApp.Models;
 using LibraryAPI.Models;
 using System.Net.Http;
 using System.Net;
+using Newtonsoft.Json;
+using LibraryAPI.Models.DTOs;
 
 namespace LibraryWebApp.Controllers
 {
@@ -37,7 +39,6 @@ namespace LibraryWebApp.Controllers
             {
                 //Storing the response details recieved from web api   
                 genres = await Res.Content.ReadAsAsync<List<Genre>>();
-
             }
             //returning the genres list to view controller
             return View(genres);
@@ -63,17 +64,27 @@ namespace LibraryWebApp.Controllers
             return View();
         }
 
-/*        // POST: Genres/Create
+        // POST: Genres/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        public async Task<Uri> Create([Bind("Id,Name")] Genre genre)
+        public async Task<IActionResult> Add([Bind("Id,Name")] Genre genre)
         {
+            Genre updatedGenre = new Genre();
+
             HttpResponseMessage res = await _client.PostAsJsonAsync(baseurl + "Genres", genre);
 
             res.EnsureSuccessStatusCode();
 
-            return res.Headers.Location;
-        }*/
+            if (res.IsSuccessStatusCode)
+            {
+                ViewBag.Feedback = "Genre Created Successfully";
+                updatedGenre = await res.Content.ReadAsAsync<Genre>();
+                return RedirectToAction("Details", new { id = updatedGenre.Id });
+            }
+
+            ViewData["Feedback"] = "Sorry, genre wasn't Created";
+            return RedirectToAction("Error");
+        }
 
         // GET: Genres/Edit/5
         public async Task<IActionResult> Edit([FromRoute]long id)
@@ -90,7 +101,7 @@ namespace LibraryWebApp.Controllers
                 genre = await res.Content.ReadAsAsync<Genre>();
                 return View(genre);
             }
-            return View(new ErrorViewModel());
+            return View("Error");
         }
 
 
@@ -99,16 +110,18 @@ namespace LibraryWebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         public async Task<IActionResult> Update([Bind("Id,Name")] Genre genre)
         {
+            //var json = JsonConvert.SerializeObject(genre);
+
             HttpResponseMessage res = await _client.PutAsJsonAsync(baseurl + $"Genres/{genre.Id}", genre);
 
             if (res.IsSuccessStatusCode)
             {
-                var updateGenre = await res.Content.ReadAsAsync<Genre>();
-                return View("Details", updateGenre.Id);
+                //var updateGenre = await res.Content.ReadAsAsync<Genre>();
+                return RedirectToAction("Details", new { id = genre.Id });
             }
             // Deserialize the updated genre from the response body.
             
-            return View("Edit", genre.Id);
+            return View(nameof(Edit), genre.Id);
             
         }
 

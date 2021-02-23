@@ -88,7 +88,7 @@ namespace LibraryWebApp.Controllers
             }
             // Deserialize the updated genre from the response body.
 
-            return View("Edit", author.Id);
+            return RedirectToAction(nameof(Edit), author.Id);
 
         }
     }

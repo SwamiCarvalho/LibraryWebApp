@@ -14,8 +14,10 @@
     @foreach (var item in Model)
     {
     <li>
-        <a asp-action="Details" asp-route-id="@item.Id"> @Html.DisplayFor(modelItem => item.FullName)</a>
-        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+        <p>
+            <a asp-action="Details" asp-route-id="@item.Id"> @Html.DisplayFor(modelItem => item.FullName)</a>
+            <span><a asp-action="Edit" asp-route-id="@item.Id">Edit</a></span>
+        </p>
     </li>
     }
 </ul>

@@ -20,12 +20,6 @@
     <a asp-action="Create">Create New</a>
 </p>
 
-@if (genreFilter != null)
-{
-    <h3>All Books with @genreFilter genre:</h3>
-}
-
-
 <table class="table">
     <thead>
         <tr>
@@ -58,7 +52,7 @@
             <tr>
                 <td>
                     <a asp-action="Details" asp-route-id="@book.Id">@Html.DisplayFor(modelItem => book.Title)</a>
-</td>
+                </td>
                 <td>
                     @Html.DisplayFor(modelItem => book.OgTitle)
                 </td>

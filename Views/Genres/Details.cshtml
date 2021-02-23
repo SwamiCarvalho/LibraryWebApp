@@ -2,9 +2,12 @@
 
 @{
     ViewData["Title"] = "Details";
+    var feedback = ViewData["Feedback"] as string;
 }
 
 <h1>Details</h1>
+
+<h2 class="alert-success">@ViewBag.Feedback</h2>
 
 <div>
     <h4>@Model.Name</h4>
