@@ -34,7 +34,7 @@ namespace LibraryWebApp.Controllers
 
 
         // GET: Books
-        public async Task<IActionResult> Index([FromQuery] string searchTerm, [FromQuery] string genre, [FromQuery] string author)
+        public async Task<IActionResult> Index([FromQuery] string? searchTerm, [FromQuery] string? genre, [FromQuery] string? author)
         {
 
             ViewData["searchTerm"] = searchTerm;

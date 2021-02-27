@@ -11,14 +11,18 @@ namespace LibraryWebApp.Data
         {
         }
 
-        public DbSet<Book> Books { get; set; }
-        public DbSet<Genre> Genres { get; set; }
-        public DbSet<BooksGenres> BooksGenres { get; set; }
+        public DbSet<Reader> Reader { get; set; }
+        public DbSet<Requisition> Requisition { get; set; }
+        public DbSet<Favourites> Favourites { get; set; }
+        
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<BooksGenres>()
-                .HasKey(b => new { b.BookId, b.GenreId });
+            modelBuilder.Entity<Requisition>()
+                .HasKey(r => new { r.ReaderId, r.BookId });
+
+            modelBuilder.Entity<Favourites>()
+                .HasKey(f => new { f.ReaderId, f.BookId });
         }
     }
 }
