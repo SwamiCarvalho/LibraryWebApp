@@ -1,4 +1,4 @@
-﻿@model LibraryAPI.Models.DTOs.BookDetailsDTO
+﻿@model LibraryAPI.Domain.Models.Book
 
 @{
     ViewData["Title"] = "Book Details";
@@ -61,13 +61,13 @@
         <dd class="col-sm-10">
             @foreach (var authorItem in Model.Authors)
              {
-                <a asp-controller="Authors" asp-action="Details" asp-route-id="@authorItem.Id">@Html.DisplayFor(model => authorItem.FullName)</a>
+                <a asp-controller="Authors" asp-action="Details" asp-route-id="@authorItem.AuthorId">@Html.DisplayFor(model => authorItem.FullName)</a>
              }
 
         </dd>
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    <a asp-action="Edit" asp-route-id="@Model.BookId">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>

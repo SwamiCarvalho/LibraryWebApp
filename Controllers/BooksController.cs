@@ -1,15 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using LibraryAPI.Models;
 using System.Net.Http;
-using LibraryAPI.Models.DTOs;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using System;
 using System.Net;
-using Newtonsoft.Json;
-using System.Text;
 using LibraryWebApp.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using LibraryAPI.Resources;
 
 namespace LibraryWebApp.Controllers
 {
@@ -42,8 +39,7 @@ namespace LibraryWebApp.Controllers
             ViewData["authorFilter"] = author;
 
 
-            List<BookDTO> books = new List<BookDTO>();
-            books = null;
+            List<BookResource> books = new List<BookResource>();
 
             //Sending request to find web api REST service resource GetAllBooks using HttpClient  
             HttpResponseMessage Res = await _client.GetAsync(baseurl + "Books");
@@ -52,7 +48,7 @@ namespace LibraryWebApp.Controllers
             if (Res.IsSuccessStatusCode)
             {
                 //Storing the response details recieved from web api   
-                books = await Res.Content.ReadAsAsync<List<BookDTO>>();
+                books = await Res.Content.ReadAsAsync<List<BookResource>>();
 
             }
             //returning the books list to view controller
@@ -63,13 +59,13 @@ namespace LibraryWebApp.Controllers
         // GET: Books/Details/5
         public async Task<IActionResult> Details([FromRoute] long id)
         {
-            BookDetailsDTO book = new BookDetailsDTO();
+            BookResource book = new BookResource();
 
             HttpResponseMessage res = await _client.GetAsync(baseurl + $"Books/{id}");
 
             if (res.IsSuccessStatusCode)
             {
-                book = await res.Content.ReadAsAsync<BookDetailsDTO>();
+                book = await res.Content.ReadAsAsync<BookResource>();
             }
             return View(book);
         }
@@ -84,8 +80,7 @@ namespace LibraryWebApp.Controllers
         {
 
             //////////////////////// GET GENRE NAMES TO POPULATE DROPDOWN LIST ///////////////////////////////////////
-            List<GenreDTO> genres = new List<GenreDTO>();
-            genres = null;
+            List<GenreResource> genres = new List<GenreResource>();
 
             //Sending request to find web api REST service resource GetAllGenres using HttpClient  
             HttpResponseMessage Res = await _client.GetAsync(baseurl + "Genres");
@@ -94,12 +89,12 @@ namespace LibraryWebApp.Controllers
             if (Res.IsSuccessStatusCode)
             {
                 //Storing the response details recieved from web api   
-                genres = await Res.Content.ReadAsAsync<List<GenreDTO>>();
+                genres = await Res.Content.ReadAsAsync<List<GenreResource>>();
 
                 List<SelectListItem> myGenres = new List<SelectListItem>();
-                foreach(GenreDTO genre in genres)
+                foreach(GenreResource genre in genres)
                 {
-                    var item = new SelectListItem { Text = genre.Name, Value = genre.Id.ToString() };
+                    var item = new SelectListItem { Text = genre.Name, Value = genre.GenreId.ToString() };
                     myGenres.Add(item);
                 }
                 
@@ -111,7 +106,7 @@ namespace LibraryWebApp.Controllers
         }
 
 
-        public async Task<IActionResult> Add([Bind("Id,Title,OgTitle,PublicationYear,Edition,Notes,PhysicalDescription")] Book book)
+        public async Task<IActionResult> Add([Bind("BookId,Title,OgTitle,PublicationYear,Edition,Notes,PhysicalDescription")] Book book)
         {
             Book newBook = new Book();
 
@@ -123,10 +118,11 @@ namespace LibraryWebApp.Controllers
             {
 
                 newBook = await res.Content.ReadAsAsync<Book>();
-                return RedirectToAction(nameof(Details), new { id = newBook.Id });
+                return RedirectToAction(nameof(Details), new { id = newBook.BookId });
+                //return CreatedAtRoute("DefaultApi", new { id = book.Id }, dto);
             }
 
-            ViewData["Feedback"] = "Sorry, genre wasn't Created";
+            ViewData["Feedback"] = "Sorry, book wasn't Created";
             return RedirectToAction("Error");
         }
 
@@ -150,20 +146,20 @@ namespace LibraryWebApp.Controllers
 
 
         // Put Updated Book
-        public async Task<IActionResult> Update([Bind("Id,Title,OgTitle,PublicationYear,Edition,Notes,PhysicalDescription")] Book book)
+        public async Task<IActionResult> Update([Bind("BookBookId,Title,OgTitle,PublicationYear,Edition,Notes,PhysicalDescription")] Book book)
         {
 
-            HttpResponseMessage res = await _client.PutAsJsonAsync(baseurl + $"Books/{book.Id}", book);
+            HttpResponseMessage res = await _client.PutAsJsonAsync(baseurl + $"Books/{book.BookId}", book);
 
             if (res.IsSuccessStatusCode)
             {
-                return RedirectToAction("Details", new { id = book.Id });
+                return RedirectToAction("Details", new { id = book.BookId });
             }
 
 
             // Deserialize the updated product from the response body.
             //book = await res.Content.ReadAsAsync<Book>();
-            return View(nameof(Edit), book.Id);
+            return View(nameof(Edit), book.BookId);
             
         }
     

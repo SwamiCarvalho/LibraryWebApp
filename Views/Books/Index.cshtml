@@ -1,4 +1,4 @@
-﻿@model IEnumerable<LibraryAPI.Models.DTOs.BookDTO>
+﻿@model IEnumerable<LibraryAPI.Resources.BookResource>
 
 @{
     ViewData["Title"] = "Books";
@@ -51,7 +51,7 @@
         {
             <tr>
                 <td>
-                    <a asp-action="Details" asp-route-id="@book.Id">@Html.DisplayFor(modelItem => book.Title)</a>
+                    <a asp-action="Details" asp-route-id="@book.BookId">@Html.DisplayFor(modelItem => book.Title)</a>
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => book.OgTitle)
@@ -80,9 +80,9 @@
                 </td>
 
                 <td>
-                    <a asp-action="Edit" asp-route-id="@book.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@book.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@book.Id">Delete</a>
+                    <a asp-action="Edit" asp-route-id="@book.BookId">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@book.BookId">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@book.BookId">Delete</a>
                 </td>
             </tr>
         }

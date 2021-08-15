@@ -1,4 +1,4 @@
-﻿@model List<LibraryAPI.Models.Author>
+﻿@model List<LibraryAPI.Resources.AuthorResource>
 
 @{
     ViewData["Title"] = "Authors";
@@ -15,8 +15,8 @@
     {
     <li>
         <p>
-            <a asp-action="Details" asp-route-id="@item.Id"> @Html.DisplayFor(modelItem => item.FullName)</a>
-            <span><a asp-action="Edit" asp-route-id="@item.Id">Edit</a></span>
+            <a asp-action="Details" asp-route-id="@item.AuthorId"> @Html.DisplayFor(modelItem => item.FullName)</a>
+            <span><a asp-action="Edit" asp-route-id="@item.AuthorId">Edit</a></span>
         </p>
     </li>
     }

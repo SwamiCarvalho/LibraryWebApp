@@ -1,4 +1,4 @@
-﻿@model LibraryAPI.Models.Author
+﻿@model LibraryAPI.Resources.AuthorResource
 
 @{
     ViewData["Title"] = "Edit";
@@ -12,8 +12,7 @@
     <div class="col-md-4">
         <form asp-action="Update">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
-            <input type="hidden" asp-for="BooksAuthors" />
+            <input type="hidden" asp-for="AuthorId" />
             <div class="form-group">
                 <label asp-for="FirstName" class="control-label"></label>
                 <input asp-for="FirstName" class="form-control" />

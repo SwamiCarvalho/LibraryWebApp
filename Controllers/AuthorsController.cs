@@ -1,4 +1,4 @@
-﻿using LibraryAPI.Models;
+﻿using LibraryAPI.Resources;
 using LibraryWebApp.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
@@ -19,11 +19,10 @@ namespace LibraryWebApp.Controllers
             _client = client;
         }
 
-        // GET: Genres
+        // GET: Authors
         public async Task<IActionResult> Index()
         {
-            List<Author> authors = new List<Author>();
-            authors = null;
+            List<AuthorResource> authors = new List<AuthorResource>();
 
             //Sending request to find web api REST service resource GetAllAuthors using HttpClient  
             HttpResponseMessage Res = await _client.GetAsync(baseurl + "Authors");
@@ -32,7 +31,7 @@ namespace LibraryWebApp.Controllers
             if (Res.IsSuccessStatusCode)
             {
                 //Storing the response details recieved from web api   
-                authors = await Res.Content.ReadAsAsync<List<Author>>();
+                authors = await Res.Content.ReadAsAsync<List<AuthorResource>>();
 
             }
             //returning the authors list to view controller
@@ -40,25 +39,25 @@ namespace LibraryWebApp.Controllers
         }
 
 
-        // GET: Genres/Details/5
+        // GET: Authors/Details/5
         public async Task<IActionResult> Details([FromRoute] long id)
         {
-            Author author = new Author();
+            AuthorResource author = new AuthorResource();
 
             HttpResponseMessage res = await _client.GetAsync(baseurl + $"Authors/{id}");
 
             if (res.IsSuccessStatusCode)
             {
-                author = await res.Content.ReadAsAsync<Author>();
+                author = await res.Content.ReadAsAsync<AuthorResource>();
             }
             return View(author);
         }
 
 
-        // GET: Genres/Edit/5
+        // GET: Authors/Edit/5
         public async Task<IActionResult> Edit([FromRoute] long id)
         {
-            Author author = new Author();
+            AuthorResource author = new AuthorResource();
 
             HttpResponseMessage res = await _client.GetAsync(baseurl + $"Authors/{id}");
 
@@ -67,28 +66,28 @@ namespace LibraryWebApp.Controllers
             if (res.IsSuccessStatusCode)
             {
                 // Deserialize the updated product from the response body.
-                author = await res.Content.ReadAsAsync<Author>();
+                author = await res.Content.ReadAsAsync<AuthorResource>();
                 return View(author);
             }
             return View(new ErrorViewModel());
         }
 
 
-        // POST: Genres/Edit/5
+        // POST: Authors/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        public async Task<IActionResult> Update([Bind("Id,FirstName,LastName")] Author author)
+        public async Task<IActionResult> Update([Bind("AuthorId,FirstName,LastName")] AuthorResource author)
         {
-            HttpResponseMessage res = await _client.PutAsJsonAsync(baseurl + $"Authors/{author.Id}", author);
+            HttpResponseMessage res = await _client.PutAsJsonAsync(baseurl + $"Authors/{author.AuthorId}", author);
 
             if (res.IsSuccessStatusCode)
             {
-                //var updateAuthor = await res.Content.ReadAsAsync<Author>();
-                return RedirectToAction("Details", new { id = author.Id });
+                //var updateAuthor = await res.Content.ReadAsAsync<AuthorResource>();
+                return RedirectToAction("Details", new { id = author.AuthorId });
             }
-            // Deserialize the updated genre from the response body.
+            // Deserialize the updated author from the response body.
 
-            return RedirectToAction(nameof(Edit), author.Id);
+            return RedirectToAction(nameof(Edit), author.AuthorId);
 
         }
     }

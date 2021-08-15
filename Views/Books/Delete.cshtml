@@ -1,4 +1,4 @@
-﻿@model LibraryAPI.Models.Book
+﻿@model LibraryAPI.Resources.BookResource
 
 @{
     ViewData["Title"] = "Delete";
@@ -35,22 +35,10 @@
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.Edition)
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Notes)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Notes)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.PhysicalDescription)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.PhysicalDescription)
-        </dd>
     </dl>
     
     <form asp-action="Delete">
-        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="BookId" />
         <input type="submit" value="Delete" class="btn btn-danger" /> |
         <a asp-action="Index">Back to List</a>
     </form>

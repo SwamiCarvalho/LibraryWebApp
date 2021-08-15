@@ -24,7 +24,7 @@ namespace LibraryWebApp.Controllers
             return View();
         }
 
-        public IActionResult Privacy()
+        public IActionResult Books()
         {
             return View();
         }

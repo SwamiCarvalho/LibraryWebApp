@@ -13,16 +13,12 @@ namespace LibraryWebApp.Data
 
         public DbSet<Reader> Reader { get; set; }
         public DbSet<Requisition> Requisition { get; set; }
-        public DbSet<Favourites> Favourites { get; set; }
+        public DbSet<Favourite> Favourites { get; set; }
         
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Requisition>()
-                .HasKey(r => new { r.ReaderId, r.BookId });
 
-            modelBuilder.Entity<Favourites>()
-                .HasKey(f => new { f.ReaderId, f.BookId });
         }
     }
 }
