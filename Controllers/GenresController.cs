@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net.Http;
 using System.Net;
 using LibraryAPI.Resources;
+using LibraryWebApp.Models;
 
 namespace LibraryWebApp.Controllers
 {
@@ -121,25 +122,49 @@ namespace LibraryWebApp.Controllers
         }
 
         // GET: Genres/Delete/5
-        public async Task<HttpStatusCode> Delete([FromRoute]long id)
+        [Route("Genres/Delete/{id}")]
+        public async Task<IActionResult> Delete([FromRoute]long id)
         {
-            HttpResponseMessage res = await _client.DeleteAsync(baseurl + $"Genres/{id}");
+            GenreResource genre = new GenreResource();
 
-            return res.StatusCode;
+            HttpResponseMessage genreRes = await _client.GetAsync(baseurl + $"Genres/{id}");
+
+            genreRes.EnsureSuccessStatusCode();
+
+            if (genreRes.IsSuccessStatusCode)
+            {
+                genre = await genreRes.Content.ReadAsAsync<GenreResource>();
+                return View(genre);
+            }
+            return View("Error");
         }
 
-        /*// POST: Genres/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(long id)
+        // POST: Genres/Delete/5
+        [Route("Genres/{id}")]
+        public async Task<IActionResult> DeleteConfirmed([FromRoute]long id)
         {
-            var genre = await _context.Genres.FindAsync(id);
-            _context.Genres.Remove(genre);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            GenreResource genre = new GenreResource();
+
+            HttpResponseMessage genreRes = await _client.DeleteAsync(baseurl + $"Genres/{id}");
+
+            if (genreRes.IsSuccessStatusCode)
+            {
+                genre = await genreRes.Content.ReadAsAsync<GenreResource>();
+                TempData["message"] = "The Genre was deleted successfully.";
+                TempData["object"] = genre;
+                return RedirectToAction("Index");
+            }
+            else
+            {
+                ViewData["Feedback"] = genreRes.Content;
+                TempData["message"] = genreRes.Content;
+                return View("Error", new ErrorViewModel());
+            }
+            
+            
         }
 
-        private bool GenreExists(long id)
+        /*private bool GenreExists(long id)
         {
             return _context.Genres.Any(e => e.GenreId == id);
         }*/

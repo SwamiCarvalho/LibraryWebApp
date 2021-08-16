@@ -13,13 +13,16 @@
 <ul>
     @foreach (var item in Model)
     {
-    <li>
-        <tr>
-            <td><a asp-action="Details" asp-route-id="@item.GenreId"> @Html.DisplayFor(modelItem => item.Name)</a></td>
-            <td><a asp-action="Edit" asp-route-id="@item.GenreId">Edit</a></td>
-        </tr>
-        
-        
-    </li>
+        <li>
+            <p>
+                <a asp-action="Details" asp-route-id="@item.GenreId"> @Html.DisplayFor(modelItem => item.Name)</a>
+                <span><a class="btn btn-primary btn-warning" asp-action="Edit" asp-route-id="@item.GenreId">Edit</a></span>
+                <span><a class="btn btn-primary btn-danger" asp-controller="Genres" asp-action="Delete" asp-route-id="@item.GenreId">Delete</a></span>
+            </p>
+        </li>
     }
 </ul>
+@if (TempData["message"] != null)
+{
+    <script>alert('@TempData["message"]');</script>
+}

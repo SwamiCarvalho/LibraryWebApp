@@ -1,4 +1,4 @@
-﻿@model LibraryAPI.Domain.Models.Book
+﻿@model LibraryAPI.Resources.BookDetailsResource
 
 @{
     ViewData["Title"] = "Book Details";
@@ -52,7 +52,11 @@
         <dd class="col-sm-10">
             @foreach (var genreItem in Model.Genres)
             {
-                @Html.DisplayFor(model => genreItem.Name)
+                <label>
+                    | <a asp-controller="Genres" asp-action="Details" asp-route-id=@genreItem.GenreId>
+                        @Html.DisplayFor(modelItem => genreItem.Name)
+                    </a> |
+                </label>
             }
         </dd>
         <dt class="col-sm-2">
@@ -61,7 +65,11 @@
         <dd class="col-sm-10">
             @foreach (var authorItem in Model.Authors)
              {
-                <a asp-controller="Authors" asp-action="Details" asp-route-id="@authorItem.AuthorId">@Html.DisplayFor(model => authorItem.FullName)</a>
+                <label>
+                    | <a asp-controller="Authors" asp-action="Details" asp-route-id=@authorItem.AuthorId>
+                        @Html.DisplayFor(modelItem => authorItem.FullName)
+                    </a> |
+                </label>
              }
 
         </dd>
