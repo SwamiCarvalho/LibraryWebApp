@@ -2,9 +2,8 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Http;
-using System.Net;
 using LibraryAPI.Resources;
-using LibraryWebApp.Models;
+using LibraryAPI.Domain.Models;
 
 namespace LibraryWebApp.Controllers
 {
@@ -24,34 +23,61 @@ namespace LibraryWebApp.Controllers
         // GET: Genres
         public async Task<IActionResult> Index()
         {
-            List<GenreResource> genres = new List<GenreResource>();
-            genres = null;
 
             //Sending request to find web api REST service resource GetAllGenres using HttpClient  
-            HttpResponseMessage Res = await _client.GetAsync(baseurl + "Genres");
+            HttpResponseMessage res = await _client.GetAsync(baseurl + "Genres");
 
             //Checking the response is successful or not which is sent using HttpClient  
-            if (Res.IsSuccessStatusCode)
-            {
-                //Storing the response details recieved from web api   
-                genres = await Res.Content.ReadAsAsync<List<GenreResource>>();
-            }
+            if (!res.IsSuccessStatusCode)
+                View("Error", new ErrorViewModel());
+
+            //Storing the response details recieved from web api   
+            var genres = await res.Content.ReadAsAsync<List<GenreResource>>();
+
             //returning the genres list to view controller
             return View(genres);
+            
         }
 
         // GET: Genres/Details/5
         public async Task<IActionResult> Details([FromRoute]long id)
         {
-            GenreResource genre = new GenreResource();
-
             HttpResponseMessage res = await _client.GetAsync(baseurl + $"Genres/{id}");
 
-            if (res.IsSuccessStatusCode)
-            {
-                 genre = await res.Content.ReadAsAsync<GenreResource>();
-            }
+            if (!res.IsSuccessStatusCode)
+                return View("Error", new ErrorViewModel());
+            
+            var genre = await res.Content.ReadAsAsync<GenreResource>();
+
             return View(genre);
+        }
+
+        // GET: Genres/Edit/5
+        public async Task<IActionResult> Edit([FromRoute] long id)
+        {
+            HttpResponseMessage res = await _client.GetAsync(baseurl + $"Genres/{id}");
+
+            if (!res.IsSuccessStatusCode)
+                return View("Error", new ErrorViewModel());
+
+            // Deserialize the updated product from the response body.
+            var genre = await res.Content.ReadAsAsync<GenreResource>();
+            return View(genre);
+
+        }
+
+        // POST: Genres/Edit/5
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        public async Task<IActionResult> Update([Bind("GenreId,Name")] GenreResource genre)
+        {
+            HttpResponseMessage res = await _client.PutAsJsonAsync(baseurl + $"Genres/{genre.GenreId}", genre);
+
+            if (!res.IsSuccessStatusCode)
+                return RedirectToAction(nameof(Edit), genre.GenreId);
+
+            //var updateGenre = await res.Content.ReadAsAsync<GenreResource>();
+            return RedirectToAction("Details", new { id = genre.GenreId });
         }
 
         // GET: Genres/Create
@@ -63,105 +89,51 @@ namespace LibraryWebApp.Controllers
         // POST: Genres/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        public async Task<IActionResult> Add([Bind("GenreId,Name")] GenreResource genre)
+        public async Task<IActionResult> Add([Bind("Name")][FromForm] SaveGenreResource genre)
         {
-            GenreResource updatedGenre = new GenreResource();
-
             HttpResponseMessage res = await _client.PostAsJsonAsync(baseurl + "Genres", genre);
 
-            res.EnsureSuccessStatusCode();
-
-            if (res.IsSuccessStatusCode)
+            if (!res.IsSuccessStatusCode)
             {
-                ViewBag.Feedback = "GenreResource Created Successfully";
-                updatedGenre = await res.Content.ReadAsAsync<GenreResource>();
-                return RedirectToAction("Details", new { id = updatedGenre.GenreId });
+                ViewData["Feedback"] = "Sorry, genre wasn't Created";
+                return View("Error", new ErrorViewModel());
+                // return RedirectToAction("Error");
             }
-
-            ViewData["Feedback"] = "Sorry, genre wasn't Created";
-            return RedirectToAction("Error");
-        }
-
-        // GET: Genres/Edit/5
-        public async Task<IActionResult> Edit([FromRoute]long id)
-        {
-            GenreResource genre = new GenreResource();
-
-            HttpResponseMessage res = await _client.GetAsync(baseurl + $"Genres/{id}");
-
-            res.EnsureSuccessStatusCode();
-
-            if (res.IsSuccessStatusCode)
-            {
-                // Deserialize the updated product from the response body.
-                genre = await res.Content.ReadAsAsync<GenreResource>();
-                return View(genre);
-            }
-            return View("Error");
-        }
-
-
-        // POST: Genres/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        public async Task<IActionResult> Update([Bind("GenreId,Name")] GenreResource genre)
-        {
-            //var json = JsonConvert.SerializeObject(genre);
-
-            HttpResponseMessage res = await _client.PutAsJsonAsync(baseurl + $"Genres/{genre.GenreId}", genre);
-
-            if (res.IsSuccessStatusCode)
-            {
-                //var updateGenre = await res.Content.ReadAsAsync<GenreResource>();
-                return RedirectToAction("Details", new { id = genre.GenreId });
-            }
-            // Deserialize the updated genre from the response body.
-            
-            return View(nameof(Edit), genre.GenreId);
-            
+                
+            ViewBag.Feedback = "GenreResource Created Successfully";
+            var newGenre = await res.Content.ReadAsAsync<GenreResource>();
+            return RedirectToAction("Details", new { id = newGenre.GenreId });
         }
 
         // GET: Genres/Delete/5
         [Route("Genres/Delete/{id}")]
-        public async Task<IActionResult> Delete([FromRoute]long id)
+        public async Task<IActionResult> Delete(long id)
         {
-            GenreResource genre = new GenreResource();
-
             HttpResponseMessage genreRes = await _client.GetAsync(baseurl + $"Genres/{id}");
 
-            genreRes.EnsureSuccessStatusCode();
+            if (!genreRes.IsSuccessStatusCode)
+                return View("Error", new ErrorViewModel());
 
-            if (genreRes.IsSuccessStatusCode)
-            {
-                genre = await genreRes.Content.ReadAsAsync<GenreResource>();
-                return View(genre);
-            }
-            return View("Error");
+            var genre = await genreRes.Content.ReadAsAsync<GenreResource>();
+            return View(genre);
+
         }
 
         // POST: Genres/Delete/5
-        [Route("Genres/{id}")]
-        public async Task<IActionResult> DeleteConfirmed([FromRoute]long id)
+        public async Task<IActionResult> DeleteConfirmed(long id)
         {
-            GenreResource genre = new GenreResource();
-
             HttpResponseMessage genreRes = await _client.DeleteAsync(baseurl + $"Genres/{id}");
-
-            if (genreRes.IsSuccessStatusCode)
+            
+            if (!genreRes.IsSuccessStatusCode)
             {
-                genre = await genreRes.Content.ReadAsAsync<GenreResource>();
-                TempData["message"] = "The Genre was deleted successfully.";
-                TempData["object"] = genre;
-                return RedirectToAction("Index");
-            }
-            else
-            {
-                ViewData["Feedback"] = genreRes.Content;
-                TempData["message"] = genreRes.Content;
+                ViewData["Feedback"] = "Sorry, genre wasn't Deleted";
                 return View("Error", new ErrorViewModel());
             }
-            
-            
+
+            var genre = await genreRes.Content.ReadAsAsync<GenreResource>();
+            TempData["message"] = "The Genre was deleted successfully.";
+            TempData["object"] = genre;
+            return RedirectToAction("Index");      
         }
 
         /*private bool GenreExists(long id)

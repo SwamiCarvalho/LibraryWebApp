@@ -1,4 +1,4 @@
-﻿using LibraryAPI.Models;
+﻿using LibraryAPI.Domain.Models;
 using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;

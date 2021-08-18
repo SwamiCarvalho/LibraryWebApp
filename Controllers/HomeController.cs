@@ -1,12 +1,8 @@
-﻿using LibraryWebApp.Models;
+﻿using LibraryAPI.Domain.Models;
+using LibraryWebApp.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text.Encodings.Web;
-using System.Threading.Tasks;
 
 namespace LibraryWebApp.Controllers
 {

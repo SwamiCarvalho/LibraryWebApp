@@ -1,4 +1,4 @@
-﻿using LibraryAPI.Models;
+﻿using LibraryAPI.Domain.Models;
 
 namespace LibraryWebApp.Models
 {

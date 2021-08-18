@@ -1,25 +1,15 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using LibraryAPI.Models;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using System.Net;
-using LibraryWebApp.Models;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using LibraryAPI.Resources;
-using System;
+using LibraryAPI.Domain.Models;
+using LibraryWebApp.Models;
 
 namespace LibraryWebApp.Controllers
 {
     public class BooksController : Controller
     {
-        /*private readonly LibraryAppDBContext _context;
-
-        public BooksController(LibraryAppDBContext context)
-        {
-            _context = context;
-        }*/
-
         // HttpClient is intended to be instantiated once per application, rather than per-use.
         private readonly HttpClient _client = new HttpClient();
 
@@ -39,49 +29,63 @@ namespace LibraryWebApp.Controllers
             ViewData["genreFilter"] = genre;
             ViewData["authorFilter"] = author;
 
-
-            List<BookResource> books = new List<BookResource>();
-
             //Sending request to find web api REST service resource GetAllBooks using HttpClient  
-            HttpResponseMessage Res = await _client.GetAsync(baseurl + "Books");
+            HttpResponseMessage res = await _client.GetAsync(baseurl + "Books");
 
             //Checking the response is successful or not which is sent using HttpClient  
-            if (Res.IsSuccessStatusCode)
-            {
-                //Storing the response details recieved from web api   
-                books = await Res.Content.ReadAsAsync<List<BookResource>>();
+            if (!res.IsSuccessStatusCode)
+                return View("Error", new ErrorViewModel());
 
-            }
+            //Storing the response details received from web api   
+            var books = await res.Content.ReadAsAsync<List<BookResource>>();
+
             //returning the books list to view controller
             return View(books);
 
         }
 
         // GET: Books/Details/5
-        public async Task<IActionResult> Details([FromRoute] long id)
+        public async Task<IActionResult> Details([FromRoute]long id)
         {
-            BookDetailsResource book = new BookDetailsResource();
-
             HttpResponseMessage res = await _client.GetAsync(baseurl + $"Books/{id}");
 
-            if (res.IsSuccessStatusCode)
-            {
-                book = await res.Content.ReadAsAsync<BookDetailsResource>();
-            }
+            if (!res.IsSuccessStatusCode)
+                return View("Error", new ErrorViewModel());
+
+            var book = await res.Content.ReadAsAsync<BookDetailsResource>();
+            return View(book);
+
+        }
+
+        public async Task<IActionResult> Edit([FromRoute] long id)
+        {
+            HttpResponseMessage res = await _client.GetAsync(baseurl + $"Books/{id}");
+
+            if (!res.IsSuccessStatusCode)
+                return View("Error", new ErrorViewModel());
+
+            // Deserialize the updated product from the response body.
+            var book = await res.Content.ReadAsAsync<BookDetailsResource>();
             return View(book);
         }
 
+        public async Task<IActionResult> Update([Bind("BookId,Title,OgTitle,PublicationYear,Edition,Notes,PhysicalDescription")] BookDetailsResource book)
+        {
+            HttpResponseMessage res = await _client.PutAsJsonAsync(baseurl + $"Books/{book.BookId}", book);
+
+            if (!res.IsSuccessStatusCode)
+                return RedirectToAction(nameof(Edit), book.BookId);
+
+            return RedirectToAction("Details", new { id = book.BookId });  
+        }
 
         // POST: Books/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-
-
-        public async Task<ActionResult> Create()
+        public async Task<IActionResult> Create()
         {
 
             //////////////////////// GET GENRE NAMES TO POPULATE DROPDOWN LIST ///////////////////////////////////////
-            List<GenreResource> genres = new List<GenreResource>();
 
             //Sending request to find web api REST service resource GetAllGenres using HttpClient  
             HttpResponseMessage genresRes = await _client.GetAsync(baseurl + "Genres");
@@ -90,12 +94,11 @@ namespace LibraryWebApp.Controllers
             if (genresRes.IsSuccessStatusCode)
             {
                 //Storing the response details received from web api   
-                genres = await genresRes.Content.ReadAsAsync<List<GenreResource>>();
+                var genres = await genresRes.Content.ReadAsAsync<List<GenreResource>>();
                 ViewBag.GenresList = genres;
             }
 
             //////////////////////// GET AUTHOR NAMES TO POPULATE DROPDOWN LIST ///////////////////////////////////////
-            List<AuthorResource> authors = new List<AuthorResource>();
 
             //Sending request to find web api REST service resource GetAllAuthors using HttpClient  
             HttpResponseMessage authorsRes = await _client.GetAsync(baseurl + "Authors");
@@ -104,96 +107,55 @@ namespace LibraryWebApp.Controllers
             if (authorsRes.IsSuccessStatusCode)
             {
                 //Storing the response details received from web api   
-                authors = await authorsRes.Content.ReadAsAsync<List<AuthorResource>>();
+                var authors = await authorsRes.Content.ReadAsAsync<List<AuthorResource>>();
                 ViewBag.AuthorsList = authors;
             }
             return View();
         }
 
 
-        public async Task<ActionResult> Add([Bind("BookId,Title,OgTitle,PublicationYear,Edition,Notes,PhysicalDescription")] Book book)
+        public async Task<IActionResult> Add([Bind("Title,OgTitle,PublicationYear,Edition,Notes,PhysicalDescription")][FromForm] SaveBookResource book)
         {
-            Book newBook = new Book();
-
             HttpResponseMessage res = await _client.PostAsJsonAsync(baseurl + "Books", book);
 
-            res.EnsureSuccessStatusCode();
-
-            if (res.IsSuccessStatusCode)
+            if (!res.IsSuccessStatusCode)
             {
-
-                newBook = await res.Content.ReadAsAsync<Book>();
-                return RedirectToAction(nameof(Details), new { id = newBook.BookId });
-                //return CreatedAtRoute("DefaultApi", new { id = book.Id }, dto);
+                ViewData["Feedback"] = "Sorry, book wasn't Created";
+                return RedirectToAction("Error");
             }
 
-            ViewData["Feedback"] = "Sorry, book wasn't Created";
-            return RedirectToAction("Error");
+            var newBook = await res.Content.ReadAsAsync<Book>();
+            return RedirectToAction(nameof(Details), new { id = newBook.BookId });
+            //return CreatedAtRoute("DefaultApi", new { id = book.Id }, dto);
         }
-
-
-        public async Task<ActionResult> Edit([FromRoute] long id)
-        {
-            BookDetailsResource book = new BookDetailsResource();
-
-            HttpResponseMessage res = await _client.GetAsync(baseurl + $"Books/{id}");
-
-            res.EnsureSuccessStatusCode();
-
-            if (res.IsSuccessStatusCode)
-            {
-                // Deserialize the updated product from the response body.
-                book = await res.Content.ReadAsAsync<BookDetailsResource>();
-                return View(book);
-            }
-            return View(new ErrorViewModel());
-        }
-
-
-        // Put Updated Book
-        public async Task<ActionResult> Update([Bind("BookBookId,Title,OgTitle,PublicationYear,Edition,Notes,PhysicalDescription")] Book book)
-        {
-
-            HttpResponseMessage res = await _client.PutAsJsonAsync(baseurl + $"Books/{book.BookId}", book);
-
-            if (res.IsSuccessStatusCode)
-            {
-                return RedirectToAction("Details", new { id = book.BookId });
-            }
-
-
-            // Deserialize the updated product from the response body.
-            //book = await res.Content.ReadAsAsync<Book>();
-            return View(nameof(Edit), book.BookId);
-            
-        }
-    
 
         // GET: Books/Delete/5
         // TODO: Create ViewModel for Delete from Book Details to Book Compressed
-
-        public async Task<ActionResult> Delete(long id)
+        [Route("Books/Delete/{id}")]
+        public async Task<IActionResult> Delete(long id)
         {
-            BookDetailsResource book = new BookDetailsResource();
+            var bookRes = await _client.GetAsync(baseurl + $"Books/{id}");
 
-            HttpResponseMessage bookRes = new HttpResponseMessage();
+            if (!bookRes.IsSuccessStatusCode)
+                return View("Error", new ErrorViewModel());
 
-            bookRes = await _client.GetAsync(baseurl + $"Books/{id}");
-
-            if (bookRes.IsSuccessStatusCode)
-            {
-                // Deserialize the updated product from the response body.
-                book = await bookRes.Content.ReadAsAsync<BookDetailsResource>();
-                return View(book);
-            }
-            return View(new ErrorViewModel());
+            // Deserialize the updated product from the response body.
+            var book = await bookRes.Content.ReadAsAsync<BookDetailsResource>();
+            return View(book);
         }
 
         // POST: Books/Delete/5
-        public async Task<ActionResult> DeleteConfirmed(long id)
+        public async Task<IActionResult> DeleteConfirmed(long id)
         {
-            await _client.DeleteAsync(baseurl + $"Books/{id}");
-            return RedirectToAction("Index");
+            var res = await _client.DeleteAsync(baseurl + $"Books/{id}");
+
+            if (!res.IsSuccessStatusCode)
+            {
+                ViewData["Feedback"] = "Sorry, book wasn't Deleted";
+                return View("Error", new ErrorViewModel());
+            }
+                
+            return RedirectToAction(nameof(Index));
         }
 
     }

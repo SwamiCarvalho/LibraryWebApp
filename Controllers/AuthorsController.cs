@@ -1,5 +1,5 @@
-﻿using LibraryAPI.Resources;
-using LibraryWebApp.Models;
+﻿using LibraryAPI.Domain.Models;
+using LibraryAPI.Resources;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -22,34 +22,31 @@ namespace LibraryWebApp.Controllers
         // GET: Authors
         public async Task<IActionResult> Index()
         {
-            List<AuthorResource> authors = new List<AuthorResource>();
-
             //Sending request to find web api REST service resource GetAllAuthors using HttpClient  
-            HttpResponseMessage Res = await _client.GetAsync(baseurl + "Authors");
+            HttpResponseMessage res = await _client.GetAsync(baseurl + "Authors");
 
             //Checking the response is successful or not which is sent using HttpClient  
-            if (Res.IsSuccessStatusCode)
-            {
-                //Storing the response details recieved from web api   
-                authors = await Res.Content.ReadAsAsync<List<AuthorResource>>();
+            if (!res.IsSuccessStatusCode)
+                RedirectToAction("Error");
 
-            }
+            //Storing the response details recieved from web api   
+            var authors = await res.Content.ReadAsAsync<List<AuthorResource>>();
+
             //returning the authors list to view controller
             return View(authors);
+
         }
 
 
         // GET: Authors/Details/5
         public async Task<IActionResult> Details([FromRoute] long id)
         {
-            AuthorResource author = new AuthorResource();
-
             HttpResponseMessage res = await _client.GetAsync(baseurl + $"Authors/{id}");
 
-            if (res.IsSuccessStatusCode)
-            {
-                author = await res.Content.ReadAsAsync<AuthorResource>();
-            }
+            if (!res.IsSuccessStatusCode)
+                return View("Error", new ErrorViewModel());
+
+            var author = await res.Content.ReadAsAsync<AuthorResource>();
             return View(author);
         }
 
@@ -57,38 +54,77 @@ namespace LibraryWebApp.Controllers
         // GET: Authors/Edit/5
         public async Task<IActionResult> Edit([FromRoute] long id)
         {
-            AuthorResource author = new AuthorResource();
-
             HttpResponseMessage res = await _client.GetAsync(baseurl + $"Authors/{id}");
 
-            res.EnsureSuccessStatusCode();
+            if (!res.IsSuccessStatusCode)
+                RedirectToAction("Error");
 
-            if (res.IsSuccessStatusCode)
-            {
-                // Deserialize the updated product from the response body.
-                author = await res.Content.ReadAsAsync<AuthorResource>();
-                return View(author);
-            }
-            return View(new ErrorViewModel());
+            // Deserialize the updated product from the response body.
+            var author = await res.Content.ReadAsAsync<AuthorResource>();
+            return View(author);
+
         }
 
 
         // POST: Authors/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        public async Task<IActionResult> Update([Bind("AuthorId,FirstName,LastName")] AuthorResource author)
+        public async Task<IActionResult> Update([Bind("AuthorId,FirstName,LastName")] Author author)
         {
             HttpResponseMessage res = await _client.PutAsJsonAsync(baseurl + $"Authors/{author.AuthorId}", author);
 
-            if (res.IsSuccessStatusCode)
+            if (!res.IsSuccessStatusCode)
+                return RedirectToAction(nameof(Edit), author.AuthorId);
+
+            //var updateAuthor = await res.Content.ReadAsAsync<AuthorResource>();
+            return RedirectToAction("Details", new { id = author.AuthorId });
+        }
+
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        public async Task<IActionResult> Add([Bind("FirstName,LastName")] SaveAuthorResource author)
+        {
+            HttpResponseMessage res = await _client.PostAsJsonAsync(baseurl + "Authors", author);
+
+            if (!res.IsSuccessStatusCode)
             {
-                //var updateAuthor = await res.Content.ReadAsAsync<AuthorResource>();
-                return RedirectToAction("Details", new { id = author.AuthorId });
+                ViewData["Feedback"] = "Sorry, author wasn't Created";
+                return RedirectToAction("Error", new ErrorViewModel());
             }
-            // Deserialize the updated author from the response body.
+                
+            var newAuthor = await res.Content.ReadAsAsync<Author>();
+            return RedirectToAction(nameof(Details), new { id = newAuthor.AuthorId });
+            //return CreatedAtRoute("DefaultApi", new { id = author.Id }, dto);
+        }
 
-            return RedirectToAction(nameof(Edit), author.AuthorId);
+        [Route("Authors/Delete/{id}")]
+        public async Task<IActionResult> Delete(long id)
+        {
+            var authorRes = await _client.GetAsync(baseurl + $"Authors/{id}");
 
+            if (!authorRes.IsSuccessStatusCode)
+                return View("Error", new ErrorViewModel());
+
+            // Deserialize the updated product from the response body.
+            var author = await authorRes.Content.ReadAsAsync<AuthorResource>();
+            return View(author);
+        }
+
+        // POST: Authors/Delete/5
+        public async Task<IActionResult> DeleteConfirmed([FromForm] long id)
+        {
+            var res = await _client.DeleteAsync(baseurl + $"Authors/{id}");
+
+            if (!res.IsSuccessStatusCode)
+            {
+                ViewData["Feedback"] = "Sorry, author wasn't Deleted";
+                return View("Error", new ErrorViewModel());
+            }
+
+            return RedirectToAction(nameof(Index));
         }
     }
-}
+}   
