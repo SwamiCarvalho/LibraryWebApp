@@ -8,6 +8,7 @@ using Microsoft.Extensions.Hosting;
 using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Web.Mvc;
 
 namespace LibraryWebApp
 {
@@ -75,6 +76,9 @@ namespace LibraryWebApp
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
+                /*endpoints.MapControllerRoute(
+                    name: "select",
+                    pattern: "{controller=Home}/{genreName?}");*/
             });
         }
     }

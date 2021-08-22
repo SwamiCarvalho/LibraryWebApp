@@ -1,4 +1,4 @@
-﻿@model List<LibraryAPI.Models.Author>
+﻿@model IEnumerable<LibraryAPI.Resources.AuthorResource>
 
 @{
     ViewData["Title"] = "Authors";
@@ -13,11 +13,16 @@
 <ul>
     @foreach (var item in Model)
     {
-    <li>
-        <p>
-            <a asp-action="Details" asp-route-id="@item.Id"> @Html.DisplayFor(modelItem => item.FullName)</a>
-            <span><a asp-action="Edit" asp-route-id="@item.Id">Edit</a></span>
-        </p>
-    </li>
+        <li>
+            <p>
+                <a asp-action="Details" asp-route-id="@item.AuthorId"> @Html.DisplayFor(modelItem => item.FullName)</a>
+                <span><a class="btn btn-primary btn-warning" asp-action="Edit" asp-route-id="@item.AuthorId">Edit</a></span>
+                <span><a class="btn btn-primary btn-danger" asp-action="Delete" asp-route-id="@item.AuthorId">Delete</a></span>
+            </p>
+        </li>
     }
 </ul>
+@if (TempData["message"] != null)
+{
+    <script>alert('@TempData["message"]');</script>
+}

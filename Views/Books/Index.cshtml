@@ -1,4 +1,4 @@
-﻿@model IEnumerable<LibraryAPI.Models.DTOs.BookDTO>
+﻿@model IEnumerable<LibraryAPI.Resources.BookResource>
 
 @{
     ViewData["Title"] = "Books";
@@ -51,7 +51,7 @@
         {
             <tr>
                 <td>
-                    <a asp-action="Details" asp-route-id="@book.Id">@Html.DisplayFor(modelItem => book.Title)</a>
+                    <a asp-controller="Books" asp-action="Details" asp-route-id="@book.BookId">@Html.DisplayFor(modelItem => book.Title)</a>
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => book.OgTitle)
@@ -65,24 +65,27 @@
                 <td>
                     @foreach (var genreItem in book.Genres)
                     {
-
-                        @Html.DisplayFor(modelItem => genreItem.Name)
-
-                    }
+                        <p>
+                            <a asp-controller="Genres" asp-action="Details" asp-route-id=@genreItem.GenreId>
+                                @Html.DisplayFor(modelItem => genreItem.Name)
+                            </a>
+                        </p>
+                     }
                 </td>
                 <td>
-                    @foreach (var genreItem in book.Authors)
+                    @foreach (var authorItem in book.Authors)
                     {
-
-                        @Html.DisplayFor(modelItem => genreItem.FullName)
-
-                    }
+                    <p>
+                        <a asp-controller="Authors" asp-action="Details" asp-route-id=@authorItem.AuthorId>
+                            @Html.DisplayFor(modelItem => authorItem.FullName)
+                        </a>
+                    </p>
+                     }
                 </td>
 
                 <td>
-                    <a asp-action="Edit" asp-route-id="@book.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@book.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@book.Id">Delete</a>
+                    <a class="btn-warning" asp-controller="Books" asp-action="Edit" asp-route-id="@book.BookId">Edit</a>
+                    <a class="btn-danger" asp-controller="Books" asp-action="Delete" asp-route-id="@book.BookId">Delete</a>
                 </td>
             </tr>
         }
