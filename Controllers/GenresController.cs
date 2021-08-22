@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net.Http;
 using LibraryAPI.Resources;
 using LibraryAPI.Domain.Models;
+using System;
 
 namespace LibraryWebApp.Controllers
 {
@@ -23,6 +24,7 @@ namespace LibraryWebApp.Controllers
         // GET: Genres
         public async Task<IActionResult> Index()
         {
+            ViewData["Title"] = "Genres";
 
             //Sending request to find web api REST service resource GetAllGenres using HttpClient  
             HttpResponseMessage res = await _client.GetAsync(baseurl + "Genres");
@@ -36,7 +38,7 @@ namespace LibraryWebApp.Controllers
 
             //returning the genres list to view controller
             return View(genres);
-            
+
         }
 
         // GET: Genres/Details/5
@@ -107,7 +109,7 @@ namespace LibraryWebApp.Controllers
 
         // GET: Genres/Delete/5
         [Route("Genres/Delete/{id}")]
-        public async Task<IActionResult> Delete(long id)
+        public async Task<IActionResult> Delete([FromRoute]long id)
         {
             HttpResponseMessage genreRes = await _client.GetAsync(baseurl + $"Genres/{id}");
 
@@ -120,8 +122,11 @@ namespace LibraryWebApp.Controllers
         }
 
         // POST: Genres/Delete/5
-        public async Task<IActionResult> DeleteConfirmed(long id)
+        public async Task<IActionResult> DeleteConfirmed()
         {
+            var genreIdString = Request.Form["GenreId"];
+            var id = Convert.ToInt64(genreIdString);
+
             HttpResponseMessage genreRes = await _client.DeleteAsync(baseurl + $"Genres/{id}");
             
             if (!genreRes.IsSuccessStatusCode)
@@ -131,10 +136,25 @@ namespace LibraryWebApp.Controllers
             }
 
             var genre = await genreRes.Content.ReadAsAsync<GenreResource>();
-            TempData["message"] = "The Genre was deleted successfully.";
-            TempData["object"] = genre;
-            return RedirectToAction("Index");      
+            //TempData["message"] = "The Genre was deleted successfully.";
+            //TempData["object"] = genre;
+            return RedirectToAction(nameof(Index));      
         }
+
+        // GET: Genres/Delete/5
+        /*[Route("{genreName}/Books")]
+        public async Task<IActionResult> Books([FromRoute]string genreName, long genreId)
+        {
+            genreId = Convert.ToInt64(ViewData["GenreId"]);
+            HttpResponseMessage res = await _client.GetAsync(baseurl + $"Genres/{genreId}");
+
+            if (!res.IsSuccessStatusCode)
+                return View("Error", new ErrorViewModel());
+
+            var books = await res.Content.ReadAsAsync<BookResource>();
+
+            return View("Views/Books/Index.cshtml", books);
+        }*/
 
         /*private bool GenreExists(long id)
         {

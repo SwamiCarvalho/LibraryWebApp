@@ -1,6 +1,7 @@
 ﻿using LibraryAPI.Domain.Models;
 using LibraryAPI.Resources;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -101,7 +102,7 @@ namespace LibraryWebApp.Controllers
         }
 
         [Route("Authors/Delete/{id}")]
-        public async Task<IActionResult> Delete(long id)
+        public async Task<IActionResult> Delete([FromRoute]long id)
         {
             var authorRes = await _client.GetAsync(baseurl + $"Authors/{id}");
 
@@ -114,8 +115,11 @@ namespace LibraryWebApp.Controllers
         }
 
         // POST: Authors/Delete/5
-        public async Task<IActionResult> DeleteConfirmed([FromForm] long id)
+        public async Task<IActionResult> DeleteConfirmed()
         {
+            var authorIdString = Request.Form["AuthorId"];
+            var id = Convert.ToInt64(authorIdString);
+
             var res = await _client.DeleteAsync(baseurl + $"Authors/{id}");
 
             if (!res.IsSuccessStatusCode)

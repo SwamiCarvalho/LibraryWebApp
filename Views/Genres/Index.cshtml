@@ -1,9 +1,5 @@
 ﻿@model IEnumerable<LibraryAPI.Resources.GenreResource>
 
-@{
-    ViewData["Title"] = "Genres";
-}
-
 <h1>@ViewData["Title"]</h1>
 
 <p>
@@ -14,7 +10,7 @@
     @foreach (var item in Model)
     {
         <li>
-            <p>
+            <p> 
                 <a asp-action="Details" asp-route-id="@item.GenreId"> @Html.DisplayFor(modelItem => item.Name)</a>
                 <span><a class="btn btn-primary btn-warning" asp-action="Edit" asp-route-id="@item.GenreId">Edit</a></span>
                 <span><a class="btn btn-primary btn-danger" asp-action="Delete" asp-route-id="@item.GenreId">Delete</a></span>

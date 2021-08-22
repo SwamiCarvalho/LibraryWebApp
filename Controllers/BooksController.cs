@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using LibraryAPI.Domain.Models;
+using LibraryAPI.Resources;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using LibraryAPI.Resources;
-using LibraryAPI.Domain.Models;
-using LibraryWebApp.Models;
+using System.Web.WebPages.Html;
 
 namespace LibraryWebApp.Controllers
 {
@@ -17,9 +19,8 @@ namespace LibraryWebApp.Controllers
 
         public BooksController(HttpClient client)
         {
-            _client = client; 
+            _client = client;
         }
-
 
         // GET: Books
         public async Task<IActionResult> Index([FromQuery] string? searchTerm, [FromQuery] string? genre, [FromQuery] string? author)
@@ -95,6 +96,14 @@ namespace LibraryWebApp.Controllers
             {
                 //Storing the response details received from web api   
                 var genres = await genresRes.Content.ReadAsAsync<List<GenreResource>>();
+
+                /*IList<SelectListItem> genresList = new List<SelectListItem>();
+                foreach (var genre in genres)
+                {
+                    var genreListItem = new SelectListItem { Text = genre.Name, Value = genre.GenreId.ToString() };
+                    genresList.Add(genreListItem);
+                }*/
+
                 ViewBag.GenresList = genres;
             }
 
@@ -108,6 +117,14 @@ namespace LibraryWebApp.Controllers
             {
                 //Storing the response details received from web api   
                 var authors = await authorsRes.Content.ReadAsAsync<List<AuthorResource>>();
+
+                /*IList<SelectListItem> authorsList = new List<SelectListItem>();
+                foreach (var author in authors)
+                {
+                    var genreListItem = new SelectListItem { Text = author.FullName, Value = author.AuthorId.ToString() };
+                    authorsList.Add(genreListItem);
+                }*/
+
                 ViewBag.AuthorsList = authors;
             }
             return View();
@@ -116,15 +133,42 @@ namespace LibraryWebApp.Controllers
 
         public async Task<IActionResult> Add([Bind("Title,OgTitle,PublicationYear,Edition,Notes,PhysicalDescription")][FromForm] SaveBookResource book)
         {
+            /*var genres = Request.Form["Genres"];
+            foreach (var genreIdString in genres)
+            {
+                var genreId = Convert.ToInt64(genreIdString);
+                HttpResponseMessage genreRes = await _client.GetAsync(baseurl + $"Genres/{genreId}");
+
+                if (!genreRes.IsSuccessStatusCode)
+                    return View("Error", new ErrorViewModel());
+
+                var genre = await genreRes.Content.ReadAsAsync<GenreResource>();
+                book.Genres.Add(genre);
+            }
+            
+
+            var authors = Request.Form["Authors"];
+            foreach (var authorIdString in authors)
+            {
+                var authorId = Convert.ToInt64(authorIdString);
+                HttpResponseMessage authorRes = await _client.GetAsync(baseurl + $"Authors/{authorId}");
+
+                if (!authorRes.IsSuccessStatusCode)
+                    return View("Error", new ErrorViewModel());
+
+                var author = await authorRes.Content.ReadAsAsync<AuthorResource>();
+                book.Authors.Add(author);
+            }*/
+
             HttpResponseMessage res = await _client.PostAsJsonAsync(baseurl + "Books", book);
 
             if (!res.IsSuccessStatusCode)
             {
                 ViewData["Feedback"] = "Sorry, book wasn't Created";
-                return RedirectToAction("Error");
+                return View("Error", new ErrorViewModel());
             }
 
-            var newBook = await res.Content.ReadAsAsync<Book>();
+            var newBook = await res.Content.ReadAsAsync<BookResource>();
             return RedirectToAction(nameof(Details), new { id = newBook.BookId });
             //return CreatedAtRoute("DefaultApi", new { id = book.Id }, dto);
         }
@@ -145,8 +189,11 @@ namespace LibraryWebApp.Controllers
         }
 
         // POST: Books/Delete/5
-        public async Task<IActionResult> DeleteConfirmed(long id)
+        public async Task<IActionResult> DeleteConfirmed()
         {
+            var bookIdString = Request.Form["BookId"];
+            var id = Convert.ToInt64(bookIdString);
+
             var res = await _client.DeleteAsync(baseurl + $"Books/{id}");
 
             if (!res.IsSuccessStatusCode)
@@ -154,8 +201,9 @@ namespace LibraryWebApp.Controllers
                 ViewData["Feedback"] = "Sorry, book wasn't Deleted";
                 return View("Error", new ErrorViewModel());
             }
-                
+            
             return RedirectToAction(nameof(Index));
+
         }
 
     }
