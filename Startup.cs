@@ -1,4 +1,7 @@
-using LibraryWebApp.Data;
+using LibraryWebApp.Domain.Repositories;
+using LibraryWebApp.Persistence.Contexts;
+using LibraryWebApp.Persistence.Repositories;
+using LibraryWebApp.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -8,7 +11,6 @@ using Microsoft.Extensions.Hosting;
 using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Web.Mvc;
 
 namespace LibraryWebApp
 {
@@ -34,11 +36,21 @@ namespace LibraryWebApp
 
             services.AddControllersWithViews();
 
-            services.AddDbContext<LibraryAppDBContext>(options =>
+            services.AddDbContext<AppDbContext>(options =>
                                                 options.UseSqlServer(Configuration["ConnectionString:LibraryAppDB"]));
 
-            //services.AddScoped<IBooksServices, BooksServices>();
-            
+
+            // Repository Services 
+            services.AddScoped<IBookingRepository, BookingRepository>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+            // Services
+            services.AddScoped<IBookingService, BookingService>();
+
+            // Automapper Service
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+
             /*services.AddHttpClient();
             services.AddHttpClient("meta", c =>
             {
