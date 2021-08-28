@@ -18,7 +18,7 @@
                     @Html.DisplayNameFor(booking => booking.EndDate)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(booking => booking.Book.Title)
+                    @Html.DisplayNameFor(booking => booking.BookId)
                 </th>
                 <th>
                     @Html.DisplayNameFor(booking => booking.Status)
@@ -39,7 +39,7 @@
                         @Html.DisplayFor(modelItem => booking.EndDate)
                     </td>
                     <td>
-                        <a asp-controller="Books" asp-action="Details" asp-route-id="@booking.Book.BookId">@Html.DisplayFor(modelItem => booking.Book.Title)</a>
+                        <a asp-controller="Books" asp-action="Details" asp-route-id="@booking.BookId">@Html.DisplayFor(modelItem => booking.BookId)</a>
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => booking.Status)

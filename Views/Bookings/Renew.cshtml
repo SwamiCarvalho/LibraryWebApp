@@ -1,0 +1,20 @@
+﻿@model LibraryWebApp.Resources.BookingResource
+
+<h1>Renew Booking</h1>
+<h2>*Insert Book Title Here*</h2>
+<h3>The new deadline that will be: @Html.DisplayFor(model => model.EndDate)</h3>
+<div>
+
+    <hr />
+
+    <h4>Do you confirm booking renewal?</h4>
+
+    <form asp-action="Update">
+        <input type="hidden" asp-for="BookingId" />
+        <input type="hidden" asp-for="StartDate" />
+        <input type="hidden" asp-for="EndDate" />
+        <input type="hidden" asp-for="Status" />
+        <input type="submit" value="Confirm" class="btn btn-warning" /> |
+        <a asp-action="Index" class="btn btn-danger">Cancel</a>
+    </form>
+</div>

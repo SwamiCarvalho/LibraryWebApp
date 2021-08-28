@@ -6,7 +6,6 @@ using LibraryWebApp.Domain.Models;
 using LibraryWebApp.Resources;
 using AutoMapper;
 using LibraryWebApp.Services;
-using System.Net.Http;
 using LibraryAPI.Resources;
 
 namespace LibraryWebApp.Controllers
@@ -16,21 +15,14 @@ namespace LibraryWebApp.Controllers
         private readonly IBookingService _bookingService;
         private readonly IMapper _mapper;
 
-        // HttpClient is intended to be instantiated once per application, rather than per-use.
-        private readonly HttpClient _client = new HttpClient();
-
-        const string baseurl = "https://localhost:44351/api/";
-
-        public BookingsController(IBookingService bookingService, IMapper mapper, HttpClient client)
+        public BookingsController(IBookingService bookingService, IMapper mapper)
         {
             _bookingService = bookingService;
-            _mapper = mapper;
-            _client = client;
         }
 
         // GET: Profile
         [Route("Bookings")]
-        public async Task<ActionResult<IEnumerable<BookingResource>>> Index()
+        public async Task<IActionResult> Index()
         {
             //TODO: depending on the user 
             ViewData["Title"] = "My Bookings";
@@ -44,20 +36,22 @@ namespace LibraryWebApp.Controllers
                 View("Error", new ErrorViewModel());
             }
 
-            if (result.Bookings == null)
-                ViewData["Feedback"] = "You dont have any Bookings yet, \r\n feel free to book a book from us ;D";
-
-            var bookingsResource = _mapper.Map<IEnumerable<Booking>, IEnumerable<BookingResource>>(result.Bookings);
+            /*if (result.Booking == null || result.Bookings.ToString().Length == 0 )
+                ViewData["Feedback"] = result.Message;*/
 
             //returning the bookings list to view controller
-            return View(bookingsResource);
-
+            return View(result.Bookings);
         }
 
         // GET: Profile/Edit/5
-        public async Task<IActionResult> Edit([FromRoute] long id)
+        public async Task<IActionResult> Renew([FromRoute]long id)
         {
             var result = await _bookingService.GetBookingByIdAsync(id);
+
+            UpdateBookingResource renewBooking = new UpdateBookingResource();
+            result.Booking.StartDate = renewBooking.StartDate;
+            result.Booking.EndDate = renewBooking.EndDate;
+            result.Booking.Status = "Renewed";
 
             if (!result.Success)
             {
@@ -65,19 +59,15 @@ namespace LibraryWebApp.Controllers
                 return View("Error", new ErrorViewModel());
             }
                 
-            // Deserialize the updated product from the response body.
-            var updatedBookingResource = _mapper.Map<Booking, BookingResource>(result.Booking);
-            return View(updatedBookingResource);
-
+            return View(result.Booking);
         }
 
         // POST: Profile/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        public async Task<IActionResult> Update([Bind("BookingId,Status")] BookingResource bookingResource)
+        public async Task<IActionResult> Update([Bind("BookingId,StartDate,EndDate,Status")] UpdateBookingResource bookingResource)
         {
-            var booking = _mapper.Map<BookingResource, Booking>(bookingResource);
-            var result = await _bookingService.UpdateBookingAsync(bookingResource.BookingId, booking);
+            var result = await _bookingService.UpdateBookingAsync(bookingResource.BookingId, bookingResource);
 
             if (!result.Success)
             {
@@ -85,37 +75,37 @@ namespace LibraryWebApp.Controllers
                 return View("Error", new ErrorViewModel());
             }
 
-            // Deserialize the updated product from the response body.
-            var updatedBooking = result.Booking;
-
-            // TODO: Return value to Information Dialog
-            var updatedBookingResource = _mapper.Map<Booking, BookingResource>(updatedBooking);
-
             //var updateBooking = await res.Content.ReadAsAsync<BookingResource>();
-            return RedirectToAction("Index", new { id = updatedBooking.BookingId });
+            return RedirectToAction("Index", new { id = result.Booking.BookingId });
         }
 
         // TODO: Create ViewModel for Delete from Book Details to Book Compressed
         [Route("Book/{id}/Booking")]
-        public async Task<IActionResult> Booking(long id)
+        public IActionResult Booking(long id, [FromForm]BookDetailsResource book)
         {
-            var bookRes = await _client.GetAsync(baseurl + $"Books/{id}");
 
-            if (!bookRes.IsSuccessStatusCode)
-                return View("Error", new ErrorViewModel());
-
-            // Deserialize the book from the response body.
-            var book = await bookRes.Content.ReadAsAsync<BookDetailsResource>();
-            
+            // TODO: Return also estimated delivery
             return View(book);
         }
 
         // POST: Profile/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        public async Task<IActionResult> Add([Bind("Name")][FromForm] BookingResource genre)
+        public async Task<IActionResult> Add([FromForm] BookDetailsResource book)
         {
-            throw new NotImplementedException();
+            CreateBookingResource newBooking = new CreateBookingResource();
+            newBooking.BookId = book.BookId;
+            newBooking.Status = "Add Working";
+
+            var result = await _bookingService.SaveBookingAsync(newBooking);
+
+            if (!result.Success)
+            {
+                ViewData["Feedback"] = result.Message;
+                return View("Error", new ErrorViewModel());
+            }
+
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Profile/Delete/5

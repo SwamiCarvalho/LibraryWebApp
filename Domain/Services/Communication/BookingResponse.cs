@@ -1,16 +1,18 @@
 ﻿using LibraryWebApp.Domain.Models;
+using LibraryWebApp.Resources;
 using System.Collections.Generic;
 
 namespace LibraryWebApp.Domain.Services.Communication
 {
     public class BookingResponse : BaseResponse
     {
-        public Booking Booking { get; private set; }
-        public IEnumerable<Booking> Bookings { get; private set; }
+        public BookingResource Booking { get; private set; }
+        public IEnumerable<BookingResource> Bookings { get; private set; }
 
-        private BookingResponse(bool success, string message, Booking booking, IEnumerable<Booking> bookings) : base(success, message)
+        private BookingResponse(bool success, string message, BookingResource booking, IEnumerable<BookingResource> bookings) : base(success, message)
         {
             Booking = booking;
+            Bookings = bookings;
         }
 
         /// <summary>
@@ -18,7 +20,7 @@ namespace LibraryWebApp.Domain.Services.Communication
         /// </summary>
         /// <param name="booking">Saved category.</param>
         /// <returns>Response.</returns>
-        public BookingResponse(Booking booking) : this(true, string.Empty, booking, null)
+        public BookingResponse(BookingResource booking) : this(true, string.Empty, booking, null)
         { }
 
         /// <summary>
@@ -29,7 +31,7 @@ namespace LibraryWebApp.Domain.Services.Communication
         public BookingResponse(string message) : this(false, message, null, null)
         { }
 
-        public BookingResponse(IEnumerable<Booking> bookings) : this(true, string.Empty, null, bookings)
+        public BookingResponse(IEnumerable<BookingResource> bookings) : this(true, string.Empty, null, bookings)
         { }
     }
 }

@@ -7,78 +7,89 @@
 <h1>@ViewData["Title"]</h1>
 
 <div>
-    <h4> @Html.DisplayFor(model => model.Title)</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Title)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Title)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.OgTitle)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.OgTitle)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.PublicationYear)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.PublicationYear)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Edition)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Edition)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Notes)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Notes)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.PhysicalDescription)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.PhysicalDescription)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Genres)
-        </dt>
-        <dd class="col-sm-10">
-            @foreach (var genreItem in Model.Genres)
-            {
-                <label>
-                    | <a asp-controller="Genres" asp-action="Details" asp-route-id=@genreItem.GenreId>
-                        @Html.DisplayFor(modelItem => genreItem.Name)
-                    </a> |
-                </label>
-            }
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Authors)
-        </dt>
-        <dd class="col-sm-10">
-            @foreach (var authorItem in Model.Authors)
-             {
-                <label>
-                    | <a asp-controller="Authors" asp-action="Details" asp-route-id=@authorItem.AuthorId>
-                        @Html.DisplayFor(modelItem => authorItem.FullName)
-                    </a> |
-                </label>
-             }
+    <form method="post" asp-controller="Bookings" asp-action="Booking" asp-route-id="@Model.BookId">
+        <input type="hidden" name="BookId" value="@Model.BookId" />
+        <h4>@Html.DisplayFor(model => model.Title)</h4>
+        <hr />
+        <dl class="row">
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Title)
+            </dt>
+            <dd class="col-sm-10">
+                <input type="hidden" name="Title" value="@Model.Title" />
+                @Html.DisplayFor(model => model.Title)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.OgTitle)
+            </dt>
+            <dd class="col-sm-10">
+                <input type="hidden" name="OgTitle" value="@Model.OgTitle" />
+                @Html.DisplayFor(model => model.OgTitle)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.PublicationYear)
+            </dt>
+            <dd class="col-sm-10">
+                <input type="hidden" name="PublicationYear" value="@Model.PublicationYear" />
+                @Html.DisplayFor(model => model.PublicationYear)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Edition)
+            </dt>
+            <dd class="col-sm-10">
+                <input type="hidden" name="Edition" value="@Model.Edition" />
+                @Html.DisplayFor(model => model.Edition)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Notes)
+            </dt>
+            <dd class="col-sm-10">
+                <input type="hidden" name="Notes" value="@Model.Notes" />
+                @Html.DisplayFor(model => model.Notes)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.PhysicalDescription)
+            </dt>
+            <dd class="col-sm-10">
+                <input type="hidden" name="PhysicalDescription" value="@Model.PhysicalDescription" />
+                @Html.DisplayFor(model => model.PhysicalDescription)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Genres)
+            </dt>
+            <dd class="col-sm-10">
+                @foreach (var genreItem in Model.Genres)
+                {
+                    <input type="hidden" name="Genre[@genreItem.GenreId]" value="@genreItem.Name" />
+                    <label>
+                        <a asp-controller="Genres" asp-action="Details" asp-route-id=@genreItem.GenreId>
+                            @Html.DisplayFor(modelItem => genreItem.Name)
+                        </a> |
+                    </label>
+                }
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Authors)
+            </dt>
+            <dd class="col-sm-10">
+                @foreach (var authorItem in Model.Authors)
+                {
+                    <input type="hidden" name="Authors[@authorItem.AuthorId]" value="@authorItem.FullName" />
+                    <label>
+                        | <a asp-controller="Authors" asp-action="Details" asp-route-id=@authorItem.AuthorId>
+                            @Html.DisplayFor(modelItem => authorItem.FullName)
+                        </a> |
+                    </label>
+                }
 
-        </dd>
-    </dl>
+            </dd>
+        </dl>
+        <input type="submit" value="Book" class="btn btn-primary btn-toolbar" />
+    </form>
 </div>
-<div>
-    <span><a class="btn btn-primary btn-toolbar" asp-controller="Bookings" asp-action="Booking" asp-route-id="@Model.BookId">Book</a></span>
-</div>
+
+
 <div>
     <a asp-action="Edit" asp-route-id="@Model.BookId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <a href="javascript:history.go(-1)">Go back</a>
 </div>

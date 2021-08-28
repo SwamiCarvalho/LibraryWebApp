@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using LibraryAPI.Resources;
 using LibraryWebApp.Domain.Models;
 using LibraryWebApp.Resources;
 
@@ -9,6 +10,7 @@ namespace LibraryWebApp.Mapping
         public ResourceToModelProfile()
         {
             CreateMap<BookingResource, Booking>();
+            CreateMap<CreateBookingResource, Booking>();
         }
     }
 }

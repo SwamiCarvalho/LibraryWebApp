@@ -36,7 +36,7 @@ namespace LibraryWebApp.Controllers
                 return View("Error", new ErrorViewModel());
 
             //Storing the response details received from web api   
-            var books = await res.Content.ReadAsAsync<List<BookResource>>();
+            var books = await res.Content.ReadAsAsync<IEnumerable<BookResource>>();
 
             //returning the books list to view controller
             return View(books);

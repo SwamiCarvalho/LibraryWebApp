@@ -3,7 +3,14 @@ using System;
 using LibraryWebApp.Domain.Repositories;
 using LibraryWebApp.Domain.Models;
 using LibraryWebApp.Domain.Services.Communication;
-
+using System.Collections.Generic;
+using LibraryWebApp.Resources;
+using Microsoft.AspNetCore.Mvc;
+using AutoMapper;
+using System.Net.Http;
+using LibraryAPI.Domain.Services.Communication;
+using LibraryAPI.Resources;
+using System.Linq;
 
 namespace LibraryWebApp.Services
 {
@@ -12,20 +19,30 @@ namespace LibraryWebApp.Services
 
         public IBookingRepository _bookingRepository;
         public readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public BookingService(IBookingRepository bookingRepository, IUnitOfWork unitOfWork)
+        // HttpClient is intended to be instantiated once per application, rather than per-use.
+        private readonly HttpClient _client = new HttpClient();
+
+        const string baseurl = "https://localhost:44351/api/";
+
+        public BookingService(IBookingRepository bookingRepository, IUnitOfWork unitOfWork, IMapper mapper, HttpClient client)
         {
             _bookingRepository = bookingRepository;
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
+            _client = client;
         }
         public async Task<BookingResponse> GetAllBookingsAsync()
         {
             var bookings = await _bookingRepository.ListAsync();
 
-            if (bookings == null)
-                return new BookingResponse("There is no bookings.");
+            if (!bookings.Any())
+                return new BookingResponse("You dont have any Bookings yet, \r\n feel free to book a book from us ;D");
 
-            return new BookingResponse(bookings);
+            var bookingsResource = _mapper.Map<IEnumerable<Booking>, IEnumerable<BookingResource>>(bookings);
+
+            return new BookingResponse(bookingsResource);
         }
 
         public async Task<BookingResponse> GetUserBookingsAsync(long id)
@@ -35,7 +52,9 @@ namespace LibraryWebApp.Services
             if (userBookings == null)
                 return new BookingResponse("There is no bookings.");
 
-            return new BookingResponse(userBookings);
+            var bookingsResource = _mapper.Map<IEnumerable<Booking>, IEnumerable<BookingResource>>(userBookings);
+
+            return new BookingResponse(bookingsResource);
         }
 
         public async Task<BookingResponse> GetBookingByIdAsync(long id)
@@ -45,17 +64,22 @@ namespace LibraryWebApp.Services
             if (booking == null)
                 return new BookingResponse("Booking not found.");
 
-            return new BookingResponse(booking);
+            var bookingsResource = _mapper.Map<Booking, BookingResource>(booking);
+
+            return new BookingResponse(bookingsResource);
         }
 
-        public async Task<BookingResponse> SaveBookingAsync(Booking booking)
+        public async Task<BookingResponse> SaveBookingAsync(CreateBookingResource bookingResource)
         {
             try
             {
+                var booking = _mapper.Map<CreateBookingResource, Booking>(bookingResource);
                 _bookingRepository.AddBooking(booking);
                 await _unitOfWork.CompleteAsync();
 
-                return new BookingResponse(booking);
+                var newBookingResource = _mapper.Map<Booking, BookingResource>(booking);
+
+                return new BookingResponse(newBookingResource);
             }
             catch (Exception ex)
             {
@@ -63,21 +87,26 @@ namespace LibraryWebApp.Services
             }
         }
 
-        public async Task<BookingResponse> UpdateBookingAsync(long id, Booking booking)
+        public async Task<BookingResponse> UpdateBookingAsync(long id, UpdateBookingResource bookingResource)
         {
             var existingBooking = await _bookingRepository.GetBookingByIdAsync(id);
 
             if (existingBooking == null)
                 return new BookingResponse("Booking not found.");
 
-            existingBooking.Status = booking.Status;
+
+            existingBooking.StartDate = bookingResource.StartDate;
+            existingBooking.EndDate = bookingResource.EndDate;
+            existingBooking.Status = bookingResource.Status;
 
             try
             {
                 _bookingRepository.UpdateBooking(existingBooking);
                 await _unitOfWork.CompleteAsync();
 
-                return new BookingResponse(existingBooking);
+                var updatedBooking = _mapper.Map<Booking, BookingResource>(existingBooking);
+
+                return new BookingResponse(updatedBooking);
             }
             catch (Exception ex)
             {
@@ -97,7 +126,9 @@ namespace LibraryWebApp.Services
                 _bookingRepository.DeleteBooking(existingBooking);
                 await _unitOfWork.CompleteAsync();
 
-                return new BookingResponse(existingBooking);
+                var deletedBooking = _mapper.Map<Booking, BookingResource>(existingBooking);
+
+                return new BookingResponse(deletedBooking);
             }
             catch (Exception ex)
             {
