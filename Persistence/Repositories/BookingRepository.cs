@@ -38,5 +38,10 @@ namespace LibraryWebApp.Persistence.Repositories
         {
             return await FindByCondition(b => b.BookingId == id).FirstOrDefaultAsync();
         }
+
+        public async Task<Booking> GetBookingByBookIdAsync(long id)
+        {
+            return await FindByCondition(b => b.BookId == id && b.Status != "Delivered").FirstOrDefaultAsync();
+        }
     }
 }

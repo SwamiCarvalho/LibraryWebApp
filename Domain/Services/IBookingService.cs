@@ -12,5 +12,6 @@ namespace LibraryWebApp.Services
         Task<BookingResponse> SaveBookingAsync(CreateBookingResource booking);
         Task<BookingResponse> UpdateBookingAsync(long id, UpdateBookingResource booking);
         Task<BookingResponse> DeleteBookingAsync(long id);
+        Task<BookingResponse> GetBookAvailability(long id);
     }
 }

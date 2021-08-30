@@ -113,8 +113,16 @@ namespace LibraryWebApp.Controllers
 
         // TODO: Create ViewModel for Delete from Book Details to Book Compressed
         [Route("Book/{id}/Booking")]
-        public IActionResult Booking(long id, [FromForm]BookDetailsResource book)
+        public async Task<IActionResult> Booking([FromForm]BookDetailsResource book)
         {
+            
+            var result = await _bookingService.GetBookAvailability(book.BookId);
+
+            if (!result.Success)
+            {
+                ViewData["Feedback"] = result.Message;
+                return View("Error", new ErrorViewModel());
+            }
 
             // TODO: Return also estimated delivery
             return View(book);

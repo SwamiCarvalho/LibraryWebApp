@@ -69,6 +69,18 @@ namespace LibraryWebApp.Services
             return new BookingResponse(bookingsResource);
         }
 
+        public async Task<BookingResponse> GetBookAvailability(long id)
+        {
+            var booking = await _bookingRepository.GetBookingByBookIdAsync(id);
+
+            if (booking != null)
+                return new BookingResponse("Sorry, but this book it's not available.");
+
+            var bookingsResource = _mapper.Map<Booking, BookingResource>(booking);
+
+            return new BookingResponse(bookingsResource);
+        }
+
         public async Task<BookingResponse> SaveBookingAsync(CreateBookingResource bookingResource)
         {
             try
