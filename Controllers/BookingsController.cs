@@ -36,9 +36,6 @@ namespace LibraryWebApp.Controllers
                 View("Error", new ErrorViewModel());
             }
 
-            /*if (result.Booking == null || result.Bookings.ToString().Length == 0 )
-                ViewData["Feedback"] = result.Message;*/
-
             //returning the bookings list to view controller
             return View(result.Bookings);
         }
@@ -48,24 +45,59 @@ namespace LibraryWebApp.Controllers
         {
             var result = await _bookingService.GetBookingByIdAsync(id);
 
-            UpdateBookingResource renewBooking = new UpdateBookingResource();
-            result.Booking.StartDate = renewBooking.StartDate;
-            result.Booking.EndDate = renewBooking.EndDate;
-            result.Booking.Status = "Renewed";
-
+            // Verify if it was possible to retrieve values.
             if (!result.Success)
             {
                 ViewData["Feedback"] = result.Message;
                 return View("Error", new ErrorViewModel());
             }
-                
+
+            // Check if it has been delivered.
+            if (result.Booking.Status == "Delivered")
+            {
+                ViewData["FeedBack"] = "It was not possible to renew book, due to, its no longer in your possesion.";
+                return View("Error", new ErrorViewModel());
+            }
+
+            // Set Date that the book was booked, the delivery deadline date and status.
+            DateTime startDate = DateTime.Now;
+            DateTime endDate = startDate.AddDays(24);
+            result.Booking.EndDate = endDate;
+            result.Booking.Status = "Renewed";
+  
+            return View(result.Booking);
+        }
+
+        public async Task<IActionResult> Deliver([FromRoute] long id)
+        {
+            var result = await _bookingService.GetBookingByIdAsync(id);
+
+            // Verify if it was possible to retrieve values.
+            if (!result.Success)
+            {
+                ViewData["Feedback"] = result.Message;
+                return View("Error", new ErrorViewModel());
+            }
+
+            // Check if it has been already delivered.
+            if (result.Booking.Status == "Delivered")
+            {
+                ViewData["FeedBack"] = "It was not possible to deliver book, due to, its no longer in your possesion.";
+                return View("Error", new ErrorViewModel());
+            }
+
+            // Set Status and Delivery Date.
+            DateTime? deliveryDate = DateTime.Now;
+            result.Booking.Status = "Delivered";
+            result.Booking.DeliveryDate = deliveryDate;
+
             return View(result.Booking);
         }
 
         // POST: Profile/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        public async Task<IActionResult> Update([Bind("BookingId,StartDate,EndDate,Status")] UpdateBookingResource bookingResource)
+        public async Task<IActionResult> Update([Bind("BookingId,StartDate,EndDate,Status,DeliveryDate")] UpdateBookingResource bookingResource)
         {
             var result = await _bookingService.UpdateBookingAsync(bookingResource.BookingId, bookingResource);
 
@@ -76,7 +108,7 @@ namespace LibraryWebApp.Controllers
             }
 
             //var updateBooking = await res.Content.ReadAsAsync<BookingResource>();
-            return RedirectToAction("Index", new { id = result.Booking.BookingId });
+            return RedirectToAction("Index");
         }
 
         // TODO: Create ViewModel for Delete from Book Details to Book Compressed
@@ -95,7 +127,8 @@ namespace LibraryWebApp.Controllers
         {
             CreateBookingResource newBooking = new CreateBookingResource();
             newBooking.BookId = book.BookId;
-            newBooking.Status = "Add Working";
+            newBooking.Status = "Booked";
+            newBooking.DeliveryDate = null;
 
             var result = await _bookingService.SaveBookingAsync(newBooking);
 

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace LibraryWebApp.Migrations
 {
-    public partial class _28_08_21 : Migration
+    public partial class _29_08_21 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -33,7 +33,7 @@ namespace LibraryWebApp.Migrations
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ReaderId = table.Column<long>(type: "bigint", nullable: true),
                     BookId = table.Column<long>(type: "bigint", nullable: false),
-                    DeliveryDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    DeliveryDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {

@@ -13,7 +13,7 @@ namespace LibraryWebApp.Resources
         public string Status { get; set; }
         public long BookId { get; set; }
         [DisplayName("Delivery Date")]
-        public DateTime DeliveryDate { get; set; }
+        public DateTime? DeliveryDate { get; set; }
         // public virtual BookTitleResource Book { get; set; }
     }
 }

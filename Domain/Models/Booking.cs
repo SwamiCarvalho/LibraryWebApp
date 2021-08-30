@@ -16,6 +16,6 @@ namespace LibraryWebApp.Domain.Models
         public string Status { get; set; }
         public virtual Reader Reader { get; set; }
         public long BookId { get; set; }
-        public DateTime DeliveryDate { get; set; }
+        public DateTime? DeliveryDate { get; set; }
     }
 }
