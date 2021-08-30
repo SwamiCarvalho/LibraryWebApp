@@ -1,42 +1,52 @@
-using LibraryWebApp.Models;
+using LibraryWebApp.Persistence;
+using LibraryWebApp.Persistence.Contexts;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Threading.Tasks;
 
 namespace LibraryWebApp
 {
     public class Program
     {
-        public static async Task Main(string[] args)
+        public static void Main(string[] args)
         {
 
 
             var host = CreateHostBuilder(args).Build();
 
-            using (var scope = host.Services.CreateScope())
+            // If Data Model changes, delete database and update seed method, starting fresh with a new database
+            CreateDbIfNotExists(host);
+
+            host.Run();
+
+        }
+
+        private static void CreateDbIfNotExists(IHost host)
+        {
+            using var scope = host.Services.CreateScope();
+            var services = scope.ServiceProvider;
+            try
             {
-                var services = scope.ServiceProvider;
-
-                try
-                {
-                    SeedData.Initialize(services);
-                }
-                catch (Exception ex)
-                {
-                    var logger = services.GetRequiredService<ILogger<Program>>();
-                    logger.LogError(ex, "An error occurred seeding the DB.");
-                }
+                // Get a database context instance from the dependency injection container.
+                var context = services.GetRequiredService<AppDbContext>();
+                // Call the SeedData.Initialize method to seed Database
+                SeedData.Initialize(context);
             }
-
-            await host.RunAsync();
-
+            catch (Exception ex)
+            {
+                Console.WriteLine("IOException source: {0}", ex.Source);
+            }
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
+                .ConfigureLogging(logging =>
+                {
+                    logging.ClearProviders();
+                    logging.AddConsole();
+                })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();

@@ -1,12 +1,10 @@
 ﻿using LibraryAPI.Domain.Models;
 using LibraryAPI.Resources;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
-using System.Web.WebPages.Html;
 
 namespace LibraryWebApp.Controllers
 {
@@ -38,7 +36,7 @@ namespace LibraryWebApp.Controllers
                 return View("Error", new ErrorViewModel());
 
             //Storing the response details received from web api   
-            var books = await res.Content.ReadAsAsync<List<BookResource>>();
+            var books = await res.Content.ReadAsAsync<IEnumerable<BookResource>>();
 
             //returning the books list to view controller
             return View(books);
@@ -60,6 +58,32 @@ namespace LibraryWebApp.Controllers
 
         public async Task<IActionResult> Edit([FromRoute] long id)
         {
+            //////////////////////// GET GENRE NAMES TO POPULATE DROPDOWN LIST ///////////////////////////////////////
+
+            //Sending request to find web api REST service resource GetAllGenres using HttpClient  
+            HttpResponseMessage genresRes = await _client.GetAsync(baseurl + "Genres");
+
+            //Checking the response is successful or not which is sent using HttpClient  
+            if (genresRes.IsSuccessStatusCode)
+            {
+                //Storing the response details received from web api   
+                var genres = await genresRes.Content.ReadAsAsync<List<GenreResource>>();
+                ViewBag.GenresList = genres;
+            }
+
+            //////////////////////// GET AUTHOR NAMES TO POPULATE DROPDOWN LIST ///////////////////////////////////////
+
+            //Sending request to find web api REST service resource GetAllAuthors using HttpClient  
+            HttpResponseMessage authorsRes = await _client.GetAsync(baseurl + "Authors");
+
+            //Checking the response is successful or not which is sent using HttpClient  
+            if (authorsRes.IsSuccessStatusCode)
+            {
+                //Storing the response details received from web api   
+                var authors = await authorsRes.Content.ReadAsAsync<List<AuthorResource>>();
+                ViewBag.AuthorsList = authors;
+            }
+
             HttpResponseMessage res = await _client.GetAsync(baseurl + $"Books/{id}");
 
             if (!res.IsSuccessStatusCode)
@@ -96,14 +120,6 @@ namespace LibraryWebApp.Controllers
             {
                 //Storing the response details received from web api   
                 var genres = await genresRes.Content.ReadAsAsync<List<GenreResource>>();
-
-                /*IList<SelectListItem> genresList = new List<SelectListItem>();
-                foreach (var genre in genres)
-                {
-                    var genreListItem = new SelectListItem { Text = genre.Name, Value = genre.GenreId.ToString() };
-                    genresList.Add(genreListItem);
-                }*/
-
                 ViewBag.GenresList = genres;
             }
 
@@ -117,14 +133,6 @@ namespace LibraryWebApp.Controllers
             {
                 //Storing the response details received from web api   
                 var authors = await authorsRes.Content.ReadAsAsync<List<AuthorResource>>();
-
-                /*IList<SelectListItem> authorsList = new List<SelectListItem>();
-                foreach (var author in authors)
-                {
-                    var genreListItem = new SelectListItem { Text = author.FullName, Value = author.AuthorId.ToString() };
-                    authorsList.Add(genreListItem);
-                }*/
-
                 ViewBag.AuthorsList = authors;
             }
             return View();
@@ -203,8 +211,6 @@ namespace LibraryWebApp.Controllers
             }
             
             return RedirectToAction(nameof(Index));
-
         }
-
     }
 }

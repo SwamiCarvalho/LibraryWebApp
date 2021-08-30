@@ -70,7 +70,7 @@ namespace LibraryWebApp.Controllers
         // POST: Authors/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        public async Task<IActionResult> Update([Bind("AuthorId,FirstName,LastName")] Author author)
+        public async Task<IActionResult> Update([Bind("AuthorId,FirstName,LastName")] AuthorResource author)
         {
             HttpResponseMessage res = await _client.PutAsJsonAsync(baseurl + $"Authors/{author.AuthorId}", author);
 

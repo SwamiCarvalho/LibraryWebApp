@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace LibraryWebApp.Models
+namespace LibraryWebApp.Domain.Models
 {
     public class Reader
     {
@@ -15,8 +15,8 @@ namespace LibraryWebApp.Models
         [Required]
         [DisplayName("Full Name")]
         public string FullName { get; set; }
-        public IList<Favourite> Favourites { get; set; }
-        public IList<Requisition> Requisitions { get; set; }
+        public virtual ICollection<Favourite> Favourites { get; set; }
+        public virtual ICollection<Booking> Bookings { get; set; }
 
     }
 }

@@ -1,22 +1,14 @@
-﻿
-using LibraryWebApp.Data;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using LibraryWebApp.Persistence.Contexts;
 
-namespace LibraryWebApp.Models
+namespace LibraryWebApp.Persistence
 {
     public class SeedData
     {
-        public static void Initialize(IServiceProvider serviceProvider)
+        public static void Initialize(AppDbContext context)
         {
-            using (var context = new LibraryAppDBContext(
-                serviceProvider.GetRequiredService<
-                    DbContextOptions<LibraryAppDBContext>>()))
-            {
+            // Automatically creates the database
+            context.Database.EnsureCreated();
+            
                 /*///////////////////// GENRES /////////////////////////
 
                 // Look for any Genres.
@@ -91,7 +83,7 @@ namespace LibraryWebApp.Models
                     context.BooksGenres.Add(bookGenres);
                 }
                 context.SaveChanges();*/
-            }
+            
         }
     }
 }

@@ -1,0 +1,28 @@
+﻿@model LibraryWebApp.Resources.BookingResource
+
+<h1>Deliver Book</h1>
+<h2>*Insert Book Title Here*</h2>
+
+<div>
+
+    <hr />
+
+    <h4>Do you really want to deliver the following book?</h4>
+
+    <dt class="col-sm-2">
+        @Html.DisplayNameFor(model => model.DeliveryDate)
+    </dt>
+    <dd class="col-sm-10">
+        @Html.DisplayFor(model => model.DeliveryDate)
+    </dd>
+
+    <form asp-action="Update">
+        <input type="hidden" asp-for="BookingId" />
+        <input type="hidden" asp-for="StartDate" />
+        <input type="hidden" asp-for="EndDate" />
+        <input type="hidden" asp-for="DeliveryDate" />
+        <input type="hidden" asp-for="Status" />
+        <input type="submit" value="Deliver" class="btn btn-warning" /> |
+        <a asp-action="Index" class="btn btn-danger">Cancel</a>
+    </form>
+</div>

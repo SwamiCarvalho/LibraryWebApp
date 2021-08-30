@@ -1,0 +1,79 @@
+﻿@model IEnumerable<LibraryWebApp.Resources.BookingResource>
+
+@{
+    var tableRowString = "";
+    @if (ViewData["CreatedBookingId"] != null)
+    {
+        tableRowString = "<tr style='background-color:#4BB543'>";
+    }
+    else
+    {
+        tableRowString = "<tr>";
+    }
+    var tableRowTag = Html.Raw(tableRowString);
+}
+
+<h1>@ViewData["Title"]</h1>
+<br />
+
+@if (ViewData["FeedBack"] == null)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(booking => booking.BookingId)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(booking => booking.StartDate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(booking => booking.EndDate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(booking => booking.BookId)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(booking => booking.Status)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(booking => booking.DeliveryDate)
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var booking in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => booking.BookingId)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => booking.StartDate)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => booking.EndDate)
+                    </td>
+                    <td>
+                        <a asp-controller="Books" asp-action="Details" asp-route-id="@booking.BookId">@Html.DisplayFor(modelItem => booking.BookId)</a>
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => booking.Status)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => booking.DeliveryDate)
+                    </td>
+
+                    <td>
+                        <a class="btn-warning" asp-action="Renew" asp-route-id="@booking.BookingId">Renew Booking</a>
+                        <a class="btn-danger" asp-action="Deliver" asp-route-id="@booking.BookingId">Deliver</a>
+                    </td>
+            </tr>
+        }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <h2 class="align-content-center alert-info">@ViewData["Feedback"]</h2>
+    }
