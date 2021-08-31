@@ -35,10 +35,7 @@ namespace LibraryWebApp
             services.AddHttpClient();
 
             services.AddControllersWithViews();
-
-            services.AddDbContext<AppDbContext>(options =>
-                                                options.UseSqlServer(Configuration["ConnectionString:LibraryAppDB"]));
-
+            services.AddRazorPages();
 
             // Repository Services 
             services.AddScoped<IBookingRepository, BookingRepository>();
@@ -49,16 +46,6 @@ namespace LibraryWebApp
 
             // Automapper Service
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-
-
-            /*services.AddHttpClient();
-            services.AddHttpClient("meta", c =>
-            {
-                c.BaseAddress = new Uri(Configuration.GetValue<string>("MetaAPI"));
-                c.DefaultRequestHeaders.Accept.Clear();
-                c.DefaultRequestHeaders.Accept.Add(
-                    new MediaTypeWithQualityHeaderValue("application/json"));
-            });*/
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -75,12 +62,11 @@ namespace LibraryWebApp
                 app.UseHsts();
             }
             app.UseHttpsRedirection();
-
-            app.UseDefaultFiles();
             app.UseStaticFiles();
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
@@ -88,9 +74,7 @@ namespace LibraryWebApp
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
-                /*endpoints.MapControllerRoute(
-                    name: "select",
-                    pattern: "{controller=Home}/{genreName?}");*/
+                endpoints.MapRazorPages();
             });
         }
     }

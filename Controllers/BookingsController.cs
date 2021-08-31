@@ -13,9 +13,8 @@ namespace LibraryWebApp.Controllers
     public class BookingsController : Controller
     {
         private readonly IBookingService _bookingService;
-        private readonly IMapper _mapper;
 
-        public BookingsController(IBookingService bookingService, IMapper mapper)
+        public BookingsController(IBookingService bookingService)
         {
             _bookingService = bookingService;
         }
@@ -148,38 +147,5 @@ namespace LibraryWebApp.Controllers
 
             return RedirectToAction(nameof(Index));
         }
-
-        // GET: Profile/Delete/5
-        [Route("Profile/Delete/{id}")]
-        public async Task<IActionResult> Delete([FromRoute]long id)
-        {
-            throw new NotImplementedException();
-        }
-
-        // POST: Profile/Delete/5
-        public async Task<IActionResult> DeleteConfirmed()
-        {
-            throw new NotImplementedException();     
-        }
-
-        // GET: Profile/Delete/5
-        /*[Route("{genreName}/Books")]
-        public async Task<IActionResult> Books([FromRoute]string genreName, long genreId)
-        {
-            genreId = Convert.ToInt64(ViewData["BookingId"]);
-            HttpResponseMessage res = await _client.GetAsync(baseurl + $"Profile/{genreId}");
-
-            if (!res.IsSuccessStatusCode)
-                return View("Error", new ErrorViewModel());
-
-            var books = await res.Content.ReadAsAsync<BookResource>();
-
-            return View("Views/Books/Index.cshtml", books);
-        }*/
-
-        /*private bool BookingExists(long id)
-        {
-            return _context.Profile.Any(e => e.BookingId == id);
-        }*/
     }
 }

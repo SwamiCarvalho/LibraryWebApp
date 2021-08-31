@@ -12,15 +12,12 @@ namespace LibraryWebApp
     {
         public static void Main(string[] args)
         {
-
-
             var host = CreateHostBuilder(args).Build();
 
             // If Data Model changes, delete database and update seed method, starting fresh with a new database
             CreateDbIfNotExists(host);
 
             host.Run();
-
         }
 
         private static void CreateDbIfNotExists(IHost host)
