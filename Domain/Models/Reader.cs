@@ -15,6 +15,7 @@ namespace LibraryWebApp.Domain.Models
         [Required]
         [DisplayName("Full Name")]
         public string FullName { get; set; }
+        public string Email { get; set; }
         public virtual ICollection<Favourite> Favourites { get; set; }
         public virtual ICollection<Booking> Bookings { get; set; }
 

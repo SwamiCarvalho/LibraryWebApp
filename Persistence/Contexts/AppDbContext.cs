@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LibraryWebApp.Persistence.Contexts
 {
+
     public class AppDbContext : IdentityDbContext<IdentityUser>
     {
         public AppDbContext (DbContextOptions<AppDbContext> options)
@@ -20,6 +21,7 @@ namespace LibraryWebApp.Persistence.Contexts
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
 
         }
     }

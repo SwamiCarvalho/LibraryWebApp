@@ -4,6 +4,9 @@ using LibraryWebApp.Persistence.Repositories;
 using LibraryWebApp.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -36,6 +39,44 @@ namespace LibraryWebApp
 
             services.AddControllersWithViews();
             services.AddRazorPages();
+
+            // Add Database Context.
+            services.AddDbContext<AppDbContext>(options =>
+                                                options.UseSqlServer(Configuration.GetConnectionString("LibraryWebAppDB")));
+
+            // Add Cookies
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+                options.CheckConsentNeeded = context => true;
+                options.MinimumSameSitePolicy = SameSiteMode.None;
+            });
+
+            // Add Identity User with Roles
+            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+                .AddRoles<IdentityRole>()
+                .AddEntityFrameworkStores<AppDbContext>()
+                .AddDefaultTokenProviders();
+
+            services.Configure<IdentityOptions>(options =>
+            {
+                // Default SignIn settings.
+                options.SignIn.RequireConfirmedEmail = false;
+                options.SignIn.RequireConfirmedPhoneNumber = false;
+            });
+
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Latest)
+                    .AddRazorPagesOptions(options =>
+                    {
+                        options.Conventions.AuthorizeAreaFolder("Identity", "/Account/Manage");
+                        options.Conventions.AuthorizeAreaPage("Identity", "/Account/Logout");
+                    });
+
+            services.ConfigureApplicationCookie(options =>
+            {
+                options.LoginPath = $"/Identity/Account/Login";
+                options.LogoutPath = $"/Identity/Account/Logout";
+                options.AccessDeniedPath = $"/Identity/Account/AccessDenied";
+            });
 
             // Repository Services 
             services.AddScoped<IBookingRepository, BookingRepository>();
