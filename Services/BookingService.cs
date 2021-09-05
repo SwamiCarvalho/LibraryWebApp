@@ -5,11 +5,8 @@ using LibraryWebApp.Domain.Models;
 using LibraryWebApp.Domain.Services.Communication;
 using System.Collections.Generic;
 using LibraryWebApp.Resources;
-using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
 using System.Net.Http;
-using LibraryAPI.Domain.Services.Communication;
-using LibraryAPI.Resources;
 using System.Linq;
 
 namespace LibraryWebApp.Services
@@ -21,17 +18,12 @@ namespace LibraryWebApp.Services
         public readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
 
-        // HttpClient is intended to be instantiated once per application, rather than per-use.
-        private readonly HttpClient _client = new HttpClient();
 
-        const string baseurl = "https://localhost:44351/api/";
-
-        public BookingService(IBookingRepository bookingRepository, IUnitOfWork unitOfWork, IMapper mapper, HttpClient client)
+        public BookingService(IBookingRepository bookingRepository, IUnitOfWork unitOfWork, IMapper mapper)
         {
             _bookingRepository = bookingRepository;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
-            _client = client;
         }
         public async Task<BookingResponse> GetAllBookingsAsync()
         {

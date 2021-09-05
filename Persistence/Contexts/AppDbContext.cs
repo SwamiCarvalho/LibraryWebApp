@@ -22,7 +22,9 @@ namespace LibraryWebApp.Persistence.Contexts
         {
             base.OnModelCreating(modelBuilder);
 
-
+            modelBuilder.Entity<IdentityRole>().HasData(new IdentityRole { Name = "Admin", NormalizedName = "ADMIN" });
+            modelBuilder.Entity<IdentityRole>().HasData(new IdentityRole { Name = "Reader", NormalizedName = "READER" });
+            modelBuilder.Entity<IdentityRole>().HasData(new IdentityRole { Name = "Librarian", NormalizedName = "LIBRARIAN" });
         }
     }
 }

@@ -1,4 +1,5 @@
 using LibraryWebApp.Domain.Repositories;
+using LibraryWebApp.Persistence;
 using LibraryWebApp.Persistence.Contexts;
 using LibraryWebApp.Persistence.Repositories;
 using LibraryWebApp.Services;
@@ -84,6 +85,7 @@ namespace LibraryWebApp
 
             // Services
             services.AddScoped<IBookingService, BookingService>();
+            services.AddScoped<IUsersRolesService, UsersRolesService>();
 
             // Automapper Service
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());

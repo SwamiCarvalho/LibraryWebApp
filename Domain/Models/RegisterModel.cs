@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
-using Foolproof;
+//using Foolproof;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -66,6 +66,7 @@ namespace LibraryWebApp.Domain.Models
             public string Role { get; set; }
             //[RequiredIf("Role", "Librarian", ErrorMessage = "A Access Code is required in order to register as Librarian.")]
             [Display(Name = "Librarian Access Code")]
+            [Compare(Utility.SecretCodes.LibCode, ErrorMessage = "You need to enter a access code in order to register as Librarian.")]
             public string LibrarianCode { get; set; }
         }
 
@@ -83,11 +84,36 @@ namespace LibraryWebApp.Domain.Models
             if (ModelState.IsValid)
             {
                 var user = new IdentityUser { UserName = Input.Email, Email = Input.Email };
+                
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
 
+                    ///////////////////////////////// My Code /////////////////////////////////
+
+                    if(Input.Role == "Librarian" & Input.LibrarianCode == Utility.SecretCodes.LibCode || Input.Role == "Reader")
+                    {
+                        var userRole = await _userManager.AddToRoleAsync(user, Input.Role);
+
+                        // Associate User to Role
+
+                        if (userRole.Succeeded)
+                        {
+                            _logger.LogInformation("Role associated with User.");
+                        }
+                        else
+                        {
+                            _logger.LogInformation("It was not possible to associate Role to User.");
+                        }
+                    }
+                    else
+                    {
+
+                    }
+
+
+                    ///////////////////////////////////////////////////////////////////////////
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
                     var callbackUrl = Url.Page(

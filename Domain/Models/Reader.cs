@@ -6,6 +6,7 @@ namespace LibraryWebApp.Domain.Models
 {
     public class Reader
     {
+        public string UserId { get; set; }
         public long ReaderId { get; set; }
         [Required]
         [DisplayName("Citzen Card Number")]

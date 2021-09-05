@@ -1,23 +1,35 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using LibraryWebApp.Domain.Models;
+using LibraryWebApp.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Linq;
 using System.Threading.Tasks;
 
-namespace LibraryAPI.Controllers
+namespace LibraryWebApp.Controllers
 {
     public class RoleController : Controller
     {
-        RoleManager<IdentityRole> roleManager;
+        private readonly IUsersRolesService _usersRolesService;
 
-        public RoleController(RoleManager<IdentityRole> roleManager)
+        public RoleController(IUsersRolesService usersRolesService)
         {
-            this.roleManager = roleManager;
+            _usersRolesService = usersRolesService;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var roles = roleManager.Roles.ToList();
-            return View(roles);
+            var result = _usersRolesService.GetAllRoles();
+
+            if (!result.Success)
+            {
+                ViewData["Feedback"] = result.Message;
+                View("Error", new ErrorViewModel());
+            }
+
+            var userId = await _usersRolesService.GetUserById(this.User);
+            var myRoles = await _usersRolesService.GetUserRolesAsync(userId.Id);
+            ViewBag.MyRole = myRoles.RolesIList;
+
+            return View(result.RolesList);
         }
 
         public IActionResult Create()
@@ -28,8 +40,35 @@ namespace LibraryAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(IdentityRole role)
         {
-            await roleManager.CreateAsync(role);
+            var result = await _usersRolesService.SaveRoleAsync(role);
+            if (!result.Success)
+            {
+                ViewData["Feedback"] = result.Message;
+                View("Error", new ErrorViewModel());
+            }
             return RedirectToAction("Index");
         }
+
+        [Route("Role/Delete")]
+        public async Task<IActionResult> Delete()
+        {
+            var roleName = Request.Form["RoleName"];
+            var result = await _usersRolesService.GetRoleByName(roleName);
+            if(!result.Success)
+            {
+                ViewData["Feedback"] = result.Message;
+                View("Error", new ErrorViewModel());
+            }
+
+            var deleteResult = await _usersRolesService.DeleteRoleAsync(result.Role);
+            if (!deleteResult.Success)
+            {
+                ViewData["Feedback"] = deleteResult.Message;
+                View("Error", new ErrorViewModel());
+            }
+            return RedirectToAction("Index");
+        }
+
+
     }
 }

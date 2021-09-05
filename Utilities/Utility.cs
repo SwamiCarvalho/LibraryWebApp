@@ -7,4 +7,9 @@ namespace LibraryWebApp.Utility
         public const string ReaderEndUser = "Reader";
         public const string LibrarianEndUser = "Librarian";
     }
+
+    public class SecretCodes
+    {
+        public const string LibCode = "/qzd4yEs9@FAwbx`";
+    }
 }
