@@ -17,9 +17,9 @@ namespace LibraryWebApp.Persistence.Repositories
             return await FindAll().ToListAsync();
         }
 
-        public async Task<IEnumerable<Booking>> ListUserBookingsAsync(long id)
+        public async Task<IEnumerable<Booking>> ListReaderBookingsAsync(long readerId)
         {
-            return await FindByCondition(b => b.Reader.ReaderId == id).ToListAsync();
+            return await FindByCondition(b => b.ReaderId == readerId).ToListAsync();
         }
 
         public void AddBooking(Booking booking)

@@ -5,11 +5,8 @@ using LibraryWebApp.Domain.Models;
 using LibraryWebApp.Domain.Services.Communication;
 using System.Collections.Generic;
 using LibraryWebApp.Resources;
-using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
 using System.Net.Http;
-using LibraryAPI.Domain.Services.Communication;
-using LibraryAPI.Resources;
 using System.Linq;
 
 namespace LibraryWebApp.Services
@@ -21,36 +18,31 @@ namespace LibraryWebApp.Services
         public readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
 
-        // HttpClient is intended to be instantiated once per application, rather than per-use.
-        private readonly HttpClient _client = new HttpClient();
 
-        const string baseurl = "https://localhost:44351/api/";
-
-        public BookingService(IBookingRepository bookingRepository, IUnitOfWork unitOfWork, IMapper mapper, HttpClient client)
+        public BookingService(IBookingRepository bookingRepository, IUnitOfWork unitOfWork, IMapper mapper)
         {
             _bookingRepository = bookingRepository;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
-            _client = client;
         }
         public async Task<BookingResponse> GetAllBookingsAsync()
         {
             var bookings = await _bookingRepository.ListAsync();
 
-            if (!bookings.Any())
-                return new BookingResponse("You dont have any Bookings yet, \r\n feel free to book a book from us ;D");
+            if (!bookings.Any() || bookings == null)
+                return new BookingResponse("There is no interested reader yet, \r\n they will start booking in no time :D .");
 
             var bookingsResource = _mapper.Map<IEnumerable<Booking>, IEnumerable<BookingResource>>(bookings);
 
             return new BookingResponse(bookingsResource);
         }
 
-        public async Task<BookingResponse> GetUserBookingsAsync(long id)
+        public async Task<BookingResponse> GetUserBookingsAsync(long readerId)
         {
-            var userBookings = await _bookingRepository.ListUserBookingsAsync(id);
+            var userBookings = await _bookingRepository.ListReaderBookingsAsync(readerId);
 
-            if (userBookings == null)
-                return new BookingResponse("There is no bookings.");
+            if (!userBookings.Any() || userBookings == null)
+                return new BookingResponse("You dont have any Bookings yet, \r\n feel free to book a book from us ;D");
 
             var bookingsResource = _mapper.Map<IEnumerable<Booking>, IEnumerable<BookingResource>>(userBookings);
 

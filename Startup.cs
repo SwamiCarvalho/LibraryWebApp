@@ -1,9 +1,13 @@
 using LibraryWebApp.Domain.Repositories;
+using LibraryWebApp.Persistence;
 using LibraryWebApp.Persistence.Contexts;
 using LibraryWebApp.Persistence.Repositories;
 using LibraryWebApp.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -35,30 +39,61 @@ namespace LibraryWebApp
             services.AddHttpClient();
 
             services.AddControllersWithViews();
+            services.AddRazorPages();
 
+            // Add Database Context.
             services.AddDbContext<AppDbContext>(options =>
-                                                options.UseSqlServer(Configuration["ConnectionString:LibraryAppDB"]));
+                                                options.UseSqlServer(Configuration.GetConnectionString("LibraryWebAppDB")));
 
+            // Add Cookies
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+                options.CheckConsentNeeded = context => true;
+                options.MinimumSameSitePolicy = SameSiteMode.None;
+            });
+
+            // Add Identity User with Roles
+            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+                .AddRoles<IdentityRole>()
+                .AddEntityFrameworkStores<AppDbContext>()
+                .AddDefaultTokenProviders();
+
+            services.Configure<IdentityOptions>(options =>
+            {
+                // Default SignIn settings.
+                options.SignIn.RequireConfirmedEmail = false;
+                options.SignIn.RequireConfirmedPhoneNumber = false;
+            });
+
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Latest)
+                    .AddRazorPagesOptions(options =>
+                    {
+                        options.Conventions.AuthorizeAreaFolder("Identity", "/Account/Manage");
+                        options.Conventions.AuthorizeAreaPage("Identity", "/Account/Logout");
+                    });
+
+            /*services.ConfigureApplicationCookie(options =>
+            {
+                options.LoginPath = $"/Identity/Account/Login";
+                options.LogoutPath = $"/Identity/Account/Logout";
+                options.AccessDeniedPath = $"/Identity/Account/AccessDenied";
+            });*/
 
             // Repository Services 
             services.AddScoped<IBookingRepository, BookingRepository>();
+            services.AddScoped<ILibrarianRepository, LibrarianRepository>();
+            services.AddScoped<IReaderRepository, ReaderRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             // Services
             services.AddScoped<IBookingService, BookingService>();
+            services.AddScoped<IUsersRolesService, UsersRolesService>();
+            services.AddScoped<ILibrarianService, LibrarianService>();
+            services.AddScoped<IReaderService, ReaderService>();
+            services.AddScoped<IGeneralService, GeneralService>();
 
             // Automapper Service
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-
-
-            /*services.AddHttpClient();
-            services.AddHttpClient("meta", c =>
-            {
-                c.BaseAddress = new Uri(Configuration.GetValue<string>("MetaAPI"));
-                c.DefaultRequestHeaders.Accept.Clear();
-                c.DefaultRequestHeaders.Accept.Add(
-                    new MediaTypeWithQualityHeaderValue("application/json"));
-            });*/
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -75,12 +110,11 @@ namespace LibraryWebApp
                 app.UseHsts();
             }
             app.UseHttpsRedirection();
-
-            app.UseDefaultFiles();
             app.UseStaticFiles();
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
@@ -88,9 +122,7 @@ namespace LibraryWebApp
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
-                /*endpoints.MapControllerRoute(
-                    name: "select",
-                    pattern: "{controller=Home}/{genreName?}");*/
+                endpoints.MapRazorPages();
             });
         }
     }

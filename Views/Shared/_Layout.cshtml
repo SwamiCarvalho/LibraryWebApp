@@ -34,6 +34,15 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Bookings" asp-action="Index">Bookings</a>
                         </li>
                     </ul>
+                    <ul class="float-right navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Role" asp-action="Index">Role</a>
+                        </li>
+                        <li class="nav-item">
+                            <partial name="_LoginPartial" />
+                        </li>
+                    </ul>
+                    
                 </div>
             </div>
         </nav>
@@ -53,6 +62,7 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <link href="~/bootstrap-3.3.6-dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/css/site.css" rel="stylesheet" />
     <script src="~/bootstrap-3.3.6-dist/js/bootstrap.js"></script>
 
     <script src="https://lipis.github.io/bootstrap-sweetalert/lib/sweet-alert.js"></script>

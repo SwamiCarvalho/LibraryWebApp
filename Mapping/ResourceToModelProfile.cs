@@ -11,6 +11,8 @@ namespace LibraryWebApp.Mapping
         {
             CreateMap<BookingResource, Booking>();
             CreateMap<CreateBookingResource, Booking>();
+            CreateMap<CreateUserResource, Reader>();
+            CreateMap<CreateUserResource, Librarian>();
         }
     }
 }

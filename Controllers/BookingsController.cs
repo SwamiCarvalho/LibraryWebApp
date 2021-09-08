@@ -1,36 +1,38 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using LibraryWebApp.Domain.Models;
 using LibraryWebApp.Resources;
-using AutoMapper;
 using LibraryWebApp.Services;
 using LibraryAPI.Resources;
+using LibraryWebApp.Domain.Services.Communication;
 
 namespace LibraryWebApp.Controllers
 {
     public class BookingsController : Controller
     {
         private readonly IBookingService _bookingService;
-        private readonly IMapper _mapper;
+        public readonly IGeneralService _generalService;
 
-        public BookingsController(IBookingService bookingService, IMapper mapper)
+        public BookingsController(IBookingService bookingService, IGeneralService generalService)
         {
             _bookingService = bookingService;
+            _generalService = generalService;
         }
 
-        // GET: Profile
-        [Route("Bookings")]
+        // GET: All Bookings (For User Librarian)
+        /*[Route("Bookings")]
         public async Task<IActionResult> Index()
         {
             //TODO: depending on the user 
             ViewData["Title"] = "My Bookings";
 
-            // Get all Bookings
             var result = await _bookingService.GetAllBookingsAsync();
+            //var user = await _generalService.GetReader(this.User);
+            // Get all Bookings
+            //var result = await _bookingService.GetUserBookingsAsync(user.Reader.ReaderId);
             //Check if it retrieved anything
-            if (!result.Success)
+            if (!result.Success || result.Bookings == null)
             {
                 ViewData["Feedback"] = result.Message;
                 View("Error", new ErrorViewModel());
@@ -38,9 +40,49 @@ namespace LibraryWebApp.Controllers
 
             //returning the bookings list to view controller
             return View(result.Bookings);
+        }*/
+
+        // GET: User Bookings (For User Reader)
+        [Route("Bookings")]
+        public async Task<IActionResult> Index()
+        {
+
+            BookingResponse result;
+            var authenticated = this.User.Identity.IsAuthenticated;
+
+            if (!authenticated)
+            {
+                ViewData["Feedback"] = "You should not have access to this! :o";
+                return View("Error", new ErrorViewModel());
+            }
+
+            if (this.User.IsInRole("Reader"))
+            {
+                ViewData["Title"] = "My Bookings";
+                // Run this segment if user is authenticated.
+                var user = await _generalService.GetReader(this.User);
+                result = await _bookingService.GetUserBookingsAsync(user.Reader.ReaderId);
+            }
+            else
+            {
+                ViewData["Title"] = "All Bookings From Users";
+                result = await _bookingService.GetAllBookingsAsync();
+            }
+            
+
+            if (!result.Success)
+            {
+                ViewData["Feedback"] = result.Message;
+                View("Error", new ErrorViewModel());
+            }
+
+            if(result == null)
+                ViewData["Feedback"] = result.Message;
+            return View(result.Bookings);
+            
         }
 
-        // GET: Profile/Edit/5
+        // GET: Bookings/Edit/5
         public async Task<IActionResult> Renew([FromRoute]long id)
         {
             var result = await _bookingService.GetBookingByIdAsync(id);
@@ -94,7 +136,7 @@ namespace LibraryWebApp.Controllers
             return View(result.Booking);
         }
 
-        // POST: Profile/Edit/5
+        // POST: Bookings/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         public async Task<IActionResult> Update([Bind("BookingId,StartDate,EndDate,Status,DeliveryDate")] UpdateBookingResource bookingResource)
@@ -128,7 +170,7 @@ namespace LibraryWebApp.Controllers
             return View(book);
         }
 
-        // POST: Profile/Create
+        // POST: Bookings/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         public async Task<IActionResult> Add([FromForm] BookDetailsResource book)
@@ -137,6 +179,16 @@ namespace LibraryWebApp.Controllers
             newBooking.BookId = book.BookId;
             newBooking.Status = "Booked";
             newBooking.DeliveryDate = null;
+
+            var reader = await _generalService.GetReader(this.User);
+
+            if(!reader.Success)
+            {
+                ViewData["Feedback"] = reader.Message;
+                return View("Error", new ErrorViewModel());
+            }
+
+            newBooking.ReaderId = reader.Reader.ReaderId;
 
             var result = await _bookingService.SaveBookingAsync(newBooking);
 
@@ -148,38 +200,5 @@ namespace LibraryWebApp.Controllers
 
             return RedirectToAction(nameof(Index));
         }
-
-        // GET: Profile/Delete/5
-        [Route("Profile/Delete/{id}")]
-        public async Task<IActionResult> Delete([FromRoute]long id)
-        {
-            throw new NotImplementedException();
-        }
-
-        // POST: Profile/Delete/5
-        public async Task<IActionResult> DeleteConfirmed()
-        {
-            throw new NotImplementedException();     
-        }
-
-        // GET: Profile/Delete/5
-        /*[Route("{genreName}/Books")]
-        public async Task<IActionResult> Books([FromRoute]string genreName, long genreId)
-        {
-            genreId = Convert.ToInt64(ViewData["BookingId"]);
-            HttpResponseMessage res = await _client.GetAsync(baseurl + $"Profile/{genreId}");
-
-            if (!res.IsSuccessStatusCode)
-                return View("Error", new ErrorViewModel());
-
-            var books = await res.Content.ReadAsAsync<BookResource>();
-
-            return View("Views/Books/Index.cshtml", books);
-        }*/
-
-        /*private bool BookingExists(long id)
-        {
-            return _context.Profile.Any(e => e.BookingId == id);
-        }*/
     }
 }

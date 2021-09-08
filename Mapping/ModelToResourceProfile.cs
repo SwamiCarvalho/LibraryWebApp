@@ -16,6 +16,9 @@ namespace LibraryWebApp.Mapping
                 .ForMember(dto => dto.Authors, opt => opt.MapFrom(x => x.Authors.ToList()));*/
 
             CreateMap<Booking, BookingResource>();
+            CreateMap<Reader, ReaderResource>();
+            CreateMap<Librarian, LibrarianResource>();
+            
         }
     }
 }
