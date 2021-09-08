@@ -14,7 +14,7 @@ namespace LibraryWebApp.Domain.Models
 
         // Devolvido / Em Posse 
         public string Status { get; set; }
-        public virtual Reader Reader { get; set; }
+        public long ReaderId { get; set; }
         public long BookId { get; set; }
         public DateTime? DeliveryDate { get; set; }
     }

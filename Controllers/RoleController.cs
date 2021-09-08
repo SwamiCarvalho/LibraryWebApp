@@ -9,11 +9,13 @@ namespace LibraryWebApp.Controllers
     public class RoleController : Controller
     {
         private readonly IUsersRolesService _usersRolesService;
+        private readonly IGeneralService _generalService;
 
-        public RoleController(IUsersRolesService usersRolesService)
+        public RoleController(IUsersRolesService usersRolesService, IGeneralService generalService)
         {
             _usersRolesService = usersRolesService;
-        }
+            _generalService = generalService;
+    }
 
         public async Task<IActionResult> Index()
         {
@@ -25,9 +27,16 @@ namespace LibraryWebApp.Controllers
                 View("Error", new ErrorViewModel());
             }
 
-            var userId = await _usersRolesService.GetUserById(this.User);
-            var myRoles = await _usersRolesService.GetUserRolesAsync(userId.Id);
-            ViewBag.MyRole = myRoles.RolesIList;
+            var myRoles = await _generalService.GetUserRoles(this.User);
+            if (myRoles.Success)
+            {
+                ViewBag.MyRole = myRoles.RolesIList;
+            }
+            else
+            {
+                ViewBag.MyRole = null;
+            }
+                
 
             return View(result.RolesList);
         }

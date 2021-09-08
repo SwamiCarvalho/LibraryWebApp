@@ -126,15 +126,30 @@ namespace LibraryWebApp.Services
 
         public async Task<IList<IdentityUser>> GetUsersByRole(string role)
         {
-            var users = await _userManager.GetUsersInRoleAsync(role);
+            try
+            { 
+                var users = await _userManager.GetUsersInRoleAsync(role);
 
-            return users;
+                return users;
+            }
+            catch
+            {
+                return null;
+            }
+
         }
 
-        public async Task<IdentityUser> GetUserById(System.Security.Claims.ClaimsPrincipal claims)
+        public async Task<IdentityUser> GetUserByClaim(System.Security.Claims.ClaimsPrincipal claims)
         {
-            var user = await _userManager.GetUserAsync(claims);
-            return user;
+            try
+            {
+                var user = await _userManager.GetUserAsync(claims);
+                return user;
+            }
+            catch
+            {
+                return null;
+            }
         }
     }
 }

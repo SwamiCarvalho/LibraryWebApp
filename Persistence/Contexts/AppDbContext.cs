@@ -15,6 +15,7 @@ namespace LibraryWebApp.Persistence.Contexts
 
         public DbSet<Booking> Bookings { get; set; }
         public DbSet<Reader> Reader { get; set; }
+        public DbSet<Librarian> Librarian { get; set; }
         public DbSet<Favourite> Favourites { get; set; }
         
 

@@ -22,6 +22,7 @@ namespace LibraryWebApp.Resources
         }
         public string Status { get; set; }
         public long BookId { get; set; }
+        public long ReaderId { get; set; }
         public DateTime? DeliveryDate { get; set; }
     }
 }

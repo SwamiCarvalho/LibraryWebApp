@@ -29,20 +29,20 @@ namespace LibraryWebApp.Services
         {
             var bookings = await _bookingRepository.ListAsync();
 
-            if (!bookings.Any())
-                return new BookingResponse("You dont have any Bookings yet, \r\n feel free to book a book from us ;D");
+            if (!bookings.Any() || bookings == null)
+                return new BookingResponse("There is no interested reader yet, \r\n they will start booking in no time :D .");
 
             var bookingsResource = _mapper.Map<IEnumerable<Booking>, IEnumerable<BookingResource>>(bookings);
 
             return new BookingResponse(bookingsResource);
         }
 
-        public async Task<BookingResponse> GetUserBookingsAsync(long id)
+        public async Task<BookingResponse> GetUserBookingsAsync(long readerId)
         {
-            var userBookings = await _bookingRepository.ListUserBookingsAsync(id);
+            var userBookings = await _bookingRepository.ListReaderBookingsAsync(readerId);
 
-            if (userBookings == null)
-                return new BookingResponse("There is no bookings.");
+            if (!userBookings.Any() || userBookings == null)
+                return new BookingResponse("You dont have any Bookings yet, \r\n feel free to book a book from us ;D");
 
             var bookingsResource = _mapper.Map<IEnumerable<Booking>, IEnumerable<BookingResource>>(userBookings);
 

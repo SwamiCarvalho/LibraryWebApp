@@ -5,6 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using AutoMapper;
+using LibraryWebApp.Resources;
+using LibraryWebApp.Services;
 //using Foolproof;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -24,17 +27,26 @@ namespace LibraryWebApp.Domain.Models
         private readonly UserManager<IdentityUser> _userManager;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly IReaderService _readerService;
+        private readonly ILibrarianService _librarianService;
+        private readonly IMapper _mapper;
 
         public RegisterModel(
             UserManager<IdentityUser> userManager,
             SignInManager<IdentityUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            IReaderService readerService,
+            IMapper mapper,
+            ILibrarianService librarianService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _readerService = readerService;
+            _librarianService = librarianService;
+            _mapper = mapper;
         }
 
         [BindProperty]
@@ -45,6 +57,19 @@ namespace LibraryWebApp.Domain.Models
         public IList<AuthenticationScheme> ExternalLogins { get; set; }
 
         public string[] Roles { get; set; }
+   /*     public bool LibCodeRequired { get { return LibCodeRequiredContition(); } }
+
+        public bool LibCodeRequiredContition()
+        {
+            string role = Input.Role;
+            string observedLibCode = Input.LibrarianCode;
+            string expectedLibCode = Utility.SecretCodes.LibCode;
+            if (role == "Librarian" & observedLibCode == expectedLibCode)
+                return true;
+            else
+                return false;
+        }*/
+
 
         public class InputModel
         {
@@ -63,10 +88,14 @@ namespace LibraryWebApp.Domain.Models
             [Display(Name = "Confirm password")]
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
+            //[DataType(DataType.Custom)]
+            [Display(Name = "Citzen Card Number")]
+            [Required(ErrorMessage = "This field needs to be inserted.")]
+            public string CCNumber { get; set; }
             public string Role { get; set; }
             //[RequiredIf("Role", "Librarian", ErrorMessage = "A Access Code is required in order to register as Librarian.")]
             [Display(Name = "Librarian Access Code")]
-            [Compare(Utility.SecretCodes.LibCode, ErrorMessage = "You need to enter a access code in order to register as Librarian.")]
+            //[Compare(Utility.SecretCodes.LibCode, ErrorMessage = "You need to enter a access code in order to register as Librarian.")]
             public string LibrarianCode { get; set; }
         }
 
@@ -74,7 +103,7 @@ namespace LibraryWebApp.Domain.Models
         {
             ReturnUrl = returnUrl;
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-            Roles = new String[]{ Utility.Roles.ReaderEndUser, Utility.Roles.LibrarianEndUser};
+            Roles = new String[] { Utility.Roles.ReaderEndUser, Utility.Roles.LibrarianEndUser };
         }
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
@@ -84,19 +113,19 @@ namespace LibraryWebApp.Domain.Models
             if (ModelState.IsValid)
             {
                 var user = new IdentityUser { UserName = Input.Email, Email = Input.Email };
-                
-                var result = await _userManager.CreateAsync(user, Input.Password);
-                if (result.Succeeded)
+
+                if (Input.Role == "Librarian" & Input.LibrarianCode == Utility.SecretCodes.LibCode || Input.Role == "Reader")
                 {
-                    _logger.LogInformation("User created a new account with password.");
 
-                    ///////////////////////////////// My Code /////////////////////////////////
-
-                    if(Input.Role == "Librarian" & Input.LibrarianCode == Utility.SecretCodes.LibCode || Input.Role == "Reader")
+                    var result = await _userManager.CreateAsync(user, Input.Password);
+                    if (result.Succeeded)
                     {
-                        var userRole = await _userManager.AddToRoleAsync(user, Input.Role);
+                        _logger.LogInformation("User created a new account with password.");
 
-                        // Associate User to Role
+                        ///////////////////////////////// My Code /////////////////////////////////
+
+                        // Associate User to a Role
+                        var userRole = await _userManager.AddToRoleAsync(user, Input.Role);
 
                         if (userRole.Succeeded)
                         {
@@ -106,43 +135,64 @@ namespace LibraryWebApp.Domain.Models
                         {
                             _logger.LogInformation("It was not possible to associate Role to User.");
                         }
+
+                        // Associating IdentityUser to a User
+                        CreateUserResource userType = new CreateUserResource();
+                        userType.Email = Input.Email;
+                        userType.UserId = user.Id;
+                        userType.CCNumber = long.Parse(Input.CCNumber);
+
+                        if (Input.Role == "Reader")
+                        {
+                            var resultUser = await _readerService.SaveReaderAsync(userType);
+                            if (!resultUser.Success)
+                            {
+                                ViewData["Feedback"] = resultUser.Message;
+                                return LocalRedirect(returnUrl);
+                            }
+                        }
+                        else
+                        {
+                            var resultUser = await _librarianService.SaveLibrarianAsync(userType);
+                            if (!resultUser.Success)
+                            {
+                                ViewData["Feedback"] = resultUser.Message;
+                                return LocalRedirect(returnUrl);
+                            }
+                        }
+
+                        ///////////////////////////////////////////////////////////////////////////
+
+                        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                        code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                        var callbackUrl = Url.Page(
+                            "/Account/ConfirmEmail",
+                            pageHandler: null,
+                            values: new { area = "Identity", userId = user.Id, code = code, returnUrl = returnUrl },
+                            protocol: Request.Scheme);
+
+                        await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
+                            $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+
+                        if (_userManager.Options.SignIn.RequireConfirmedAccount)
+                        {
+                            return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
+                        }
+                        else
+                        {
+                            await _signInManager.SignInAsync(user, isPersistent: false);
+                            return LocalRedirect(returnUrl);
+                        }
                     }
-                    else
+                    foreach (var error in result.Errors)
                     {
-
+                        ModelState.AddModelError(string.Empty, error.Description);
                     }
-
-
-                    ///////////////////////////////////////////////////////////////////////////
-                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                    var callbackUrl = Url.Page(
-                        "/Account/ConfirmEmail",
-                        pageHandler: null,
-                        values: new { area = "Identity", userId = user.Id, code = code, returnUrl = returnUrl },
-                        protocol: Request.Scheme);
-
-                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
-
-                    if (_userManager.Options.SignIn.RequireConfirmedAccount)
-                    {
-                        return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
-                    }
-                    else
-                    {
-                        await _signInManager.SignInAsync(user, isPersistent: false);
-                        return LocalRedirect(returnUrl);
-                    }
-                }
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError(string.Empty, error.Description);
                 }
             }
 
             // If we got this far, something failed, redisplay form
-            return Page();
+            return RedirectToPage("RegisterConfirmation");
         }
     }
 }

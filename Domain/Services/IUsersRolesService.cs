@@ -19,6 +19,6 @@ namespace LibraryWebApp.Services
 
         // Users
         Task<IList<IdentityUser>> GetUsersByRole(string role);
-        Task<IdentityUser> GetUserById(System.Security.Claims.ClaimsPrincipal claims);
+        Task<IdentityUser> GetUserByClaim(System.Security.Claims.ClaimsPrincipal claims);
     }
 }

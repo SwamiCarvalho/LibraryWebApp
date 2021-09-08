@@ -72,20 +72,25 @@ namespace LibraryWebApp
                         options.Conventions.AuthorizeAreaPage("Identity", "/Account/Logout");
                     });
 
-            services.ConfigureApplicationCookie(options =>
+            /*services.ConfigureApplicationCookie(options =>
             {
                 options.LoginPath = $"/Identity/Account/Login";
                 options.LogoutPath = $"/Identity/Account/Logout";
                 options.AccessDeniedPath = $"/Identity/Account/AccessDenied";
-            });
+            });*/
 
             // Repository Services 
             services.AddScoped<IBookingRepository, BookingRepository>();
+            services.AddScoped<ILibrarianRepository, LibrarianRepository>();
+            services.AddScoped<IReaderRepository, ReaderRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             // Services
             services.AddScoped<IBookingService, BookingService>();
             services.AddScoped<IUsersRolesService, UsersRolesService>();
+            services.AddScoped<ILibrarianService, LibrarianService>();
+            services.AddScoped<IReaderService, ReaderService>();
+            services.AddScoped<IGeneralService, GeneralService>();
 
             // Automapper Service
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());

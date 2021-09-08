@@ -4,14 +4,16 @@ using LibraryWebApp.Persistence.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace LibraryWebApp.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210906021858_DbWithUsers")]
+    partial class DbWithUsers
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -71,27 +73,6 @@ namespace LibraryWebApp.Migrations
                     b.ToTable("Favourites");
                 });
 
-            modelBuilder.Entity("LibraryWebApp.Domain.Models.Librarian", b =>
-                {
-                    b.Property<long>("LibrarianId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .UseIdentityColumn();
-
-                    b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FullName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("LibrarianId");
-
-                    b.ToTable("Librarian");
-                });
-
             modelBuilder.Entity("LibraryWebApp.Domain.Models.Reader", b =>
                 {
                     b.Property<long>("ReaderId")
@@ -148,22 +129,22 @@ namespace LibraryWebApp.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "4285f7a7-5fd8-46c2-8638-91924362b310",
-                            ConcurrencyStamp = "a336a14f-8f5e-409e-9185-7be03b85d2f2",
+                            Id = "9cfddb30-7800-4f7d-96ef-c4104302809b",
+                            ConcurrencyStamp = "9693b32a-f47c-4dd3-b00d-1737fd7ac3ac",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "e90d7bdd-f3c8-4c67-af10-f0035a76ddb1",
-                            ConcurrencyStamp = "d460cfb8-0552-433f-bb20-13ed3254759f",
+                            Id = "18b42120-34ca-4d06-af6e-b99d3af9f31e",
+                            ConcurrencyStamp = "57a68afa-8f4f-4dde-a22d-3df7cf887aff",
                             Name = "Reader",
                             NormalizedName = "READER"
                         },
                         new
                         {
-                            Id = "28aeb7d6-4332-4f24-8253-55b9bea4c63e",
-                            ConcurrencyStamp = "d72c6073-b000-499b-abc6-0c4c9af16c63",
+                            Id = "009a71f4-df4f-41ac-a2c5-40cb61f77dfd",
+                            ConcurrencyStamp = "b3825d98-a5fa-4eb7-a5bc-28e5e3988cf7",
                             Name = "Librarian",
                             NormalizedName = "LIBRARIAN"
                         });
