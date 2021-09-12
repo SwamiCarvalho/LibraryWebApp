@@ -84,8 +84,11 @@
 
             </dd>
         </dl>
-        <input type="submit" value="Book" class="btn btn-primary btn-toolbar" />
-    </form>
+        @if (this.User.IsInRole("Librarian") || this.User.IsInRole("Administrator"))
+        {
+            <input type="submit" value="Book" class="btn btn-primary btn-toolbar" />
+         }
+        </form>
 </div>
 
 
