@@ -1,11 +1,13 @@
 ﻿using LibraryWebApp.Domain.Models;
 using LibraryWebApp.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
 namespace LibraryWebApp.Controllers
 {
+    [Authorize]
     public class RoleController : Controller
     {
         private readonly IUsersRolesService _usersRolesService;
@@ -30,11 +32,12 @@ namespace LibraryWebApp.Controllers
             var myRoles = await _generalService.GetUserRoles(this.User);
             if (myRoles.Success)
             {
-                ViewBag.MyRole = myRoles.RolesIList;
+                ViewBag.MyRole = myRoles.RoleString;
             }
             else
             {
                 ViewBag.MyRole = null;
+                ViewBag.Feedback = myRoles.Message;
             }
                 
 

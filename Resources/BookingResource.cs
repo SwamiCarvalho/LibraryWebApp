@@ -5,6 +5,7 @@ namespace LibraryWebApp.Resources
 {
     public class BookingResource
     {
+        [DisplayName("Booking ID")]
         public long BookingId { get; set; }
         [DisplayName("Booking Date")]
         public DateTime StartDate { get; set; }

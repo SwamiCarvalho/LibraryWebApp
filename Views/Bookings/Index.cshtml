@@ -1,18 +1,5 @@
 ﻿@model IEnumerable<LibraryWebApp.Resources.BookingResource>
 
-@{
-    var tableRowString = "";
-    @if (ViewData["CreatedBookingId"] != null)
-    {
-        tableRowString = "<tr style='background-color:#4BB543'>";
-    }
-    else
-    {
-        tableRowString = "<tr>";
-    }
-    var tableRowTag = Html.Raw(tableRowString);
-}
-
 <h1>@ViewData["Title"]</h1>
 <br />
 
@@ -21,9 +8,13 @@
     <table class="table">
         <thead>
             <tr>
-                <th>
-                    @Html.DisplayNameFor(booking => booking.BookingId)
-                </th>
+                @if (!this.User.IsInRole("Reader"))
+                {
+                    <th>
+                        @Html.DisplayNameFor(booking => booking.BookingId)
+                    </th>
+                }
+
                 <th>
                     @Html.DisplayNameFor(booking => booking.StartDate)
                 </th>
@@ -44,10 +35,13 @@
         <tbody>
             @foreach (var booking in Model)
             {
-                <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => booking.BookingId)
-                    </td>
+                <tr @booking.Status>
+                    @if (this.User.IsInRole("Librarian"))
+                    {
+                        <td>
+                            @Html.DisplayFor(modelItem => booking.BookingId)
+                        </td>
+                    }
                     <td>
                         @Html.DisplayFor(modelItem => booking.StartDate)
                     </td>
@@ -66,14 +60,17 @@
 
                     <td>
                         <a class="btn-warning" asp-action="Renew" asp-route-id="@booking.BookingId">Renew Booking</a>
-                        <a class="btn-danger" asp-action="Deliver" asp-route-id="@booking.BookingId">Deliver</a>
+                        @if (!this.User.IsInRole("Reader"))
+                        {
+                            <a class="btn-danger" asp-action="Deliver" asp-route-id="@booking.BookingId">Deliver</a>
+                        }
                     </td>
-            </tr>
-        }
-            </tbody>
-        </table>
-    }
-    else
-    {
-        <h2 class="align-content-center alert-info">@ViewData["Feedback"]</h2>
-    }
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <h2 class="align-content-center alert-info">@ViewData["Feedback"]</h2>
+}

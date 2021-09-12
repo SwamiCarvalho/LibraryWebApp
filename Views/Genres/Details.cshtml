@@ -22,6 +22,9 @@
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.GenreId">Edit</a> |
+    @if (this.User.IsInRole("Librarian") || this.User.IsInRole("Administrator"))
+    {
+        <a asp-action="Edit" asp-route-id="@Model.GenreId">Edit</a> <span>|</span>
+     }
     <a asp-action="Index">Back to List</a>
 </div>

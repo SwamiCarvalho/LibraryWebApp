@@ -6,9 +6,11 @@ using LibraryWebApp.Resources;
 using LibraryWebApp.Services;
 using LibraryAPI.Resources;
 using LibraryWebApp.Domain.Services.Communication;
+using Microsoft.AspNetCore.Authorization;
 
 namespace LibraryWebApp.Controllers
 {
+    [Authorize]
     public class BookingsController : Controller
     {
         private readonly IBookingService _bookingService;
@@ -110,6 +112,7 @@ namespace LibraryWebApp.Controllers
             return View(result.Booking);
         }
 
+        [Authorize(Roles = "Librarian,Administrator")]
         public async Task<IActionResult> Deliver([FromRoute] long id)
         {
             var result = await _bookingService.GetBookingByIdAsync(id);

@@ -24,6 +24,10 @@
         </dd>
     </dl>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model.AuthorId">Edit</a>
-</div>
+@if (this.User.IsInRole("Librarian") || this.User.IsInRole("Administrator"))
+{
+    <div>
+        <a asp-action="Edit" asp-route-id="@Model.AuthorId">Edit</a>
+    </div>
+}
+    

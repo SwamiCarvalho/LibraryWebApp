@@ -1,5 +1,6 @@
-﻿using LibraryAPI.Domain.Models;
-using LibraryAPI.Resources;
+﻿using LibraryAPI.Resources;
+using LibraryWebApp.Domain.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -23,7 +24,6 @@ namespace LibraryWebApp.Controllers
         // GET: Books
         public async Task<IActionResult> Index([FromQuery] string? searchTerm, [FromQuery] string? genre, [FromQuery] string? author)
         {
-
             ViewData["searchTerm"] = searchTerm;
             ViewData["genreFilter"] = genre;
             ViewData["authorFilter"] = author;
@@ -56,6 +56,7 @@ namespace LibraryWebApp.Controllers
 
         }
 
+        [Authorize(Roles = "Librarian,Administrator")]
         public async Task<IActionResult> Edit([FromRoute] long id)
         {
             //////////////////////// GET GENRE NAMES TO POPULATE DROPDOWN LIST ///////////////////////////////////////
@@ -94,6 +95,7 @@ namespace LibraryWebApp.Controllers
             return View(book);
         }
 
+        [Authorize(Roles = "Librarian,Administrator")]
         public async Task<IActionResult> Update([Bind("BookId,Title,OgTitle,PublicationYear,Edition,Notes,PhysicalDescription")] BookDetailsResource book)
         {
             HttpResponseMessage res = await _client.PutAsJsonAsync(baseurl + $"Books/{book.BookId}", book);
@@ -107,39 +109,17 @@ namespace LibraryWebApp.Controllers
         // POST: Books/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        public async Task<IActionResult> Create()
+        [Authorize(Roles = "Librarian,Administrator")]
+        public IActionResult Create()
         {
+            ViewData["Title"] = "Create";
 
-            //////////////////////// GET GENRE NAMES TO POPULATE DROPDOWN LIST ///////////////////////////////////////
-
-            //Sending request to find web api REST service resource GetAllGenres using HttpClient  
-            HttpResponseMessage genresRes = await _client.GetAsync(baseurl + "Genres");
-
-            //Checking the response is successful or not which is sent using HttpClient  
-            if (genresRes.IsSuccessStatusCode)
-            {
-                //Storing the response details received from web api   
-                var genres = await genresRes.Content.ReadAsAsync<List<GenreResource>>();
-                ViewBag.GenresList = genres;
-            }
-
-            //////////////////////// GET AUTHOR NAMES TO POPULATE DROPDOWN LIST ///////////////////////////////////////
-
-            //Sending request to find web api REST service resource GetAllAuthors using HttpClient  
-            HttpResponseMessage authorsRes = await _client.GetAsync(baseurl + "Authors");
-
-            //Checking the response is successful or not which is sent using HttpClient  
-            if (authorsRes.IsSuccessStatusCode)
-            {
-                //Storing the response details received from web api   
-                var authors = await authorsRes.Content.ReadAsAsync<List<AuthorResource>>();
-                ViewBag.AuthorsList = authors;
-            }
             return View();
         }
 
 
-        public async Task<IActionResult> Add([Bind("Title,OgTitle,PublicationYear,Edition,Notes,PhysicalDescription")][FromForm] SaveBookResource book)
+        [Authorize(Roles = "Librarian,Administrator")]
+        public async Task<IActionResult> Add([Bind("Title,OgTitle,PublicationYear,Edition,Notes,PhysicalDescription,Genres,Books")] SaveBookResource book)
         {
             /*var genres = Request.Form["Genres"];
             foreach (var genreIdString in genres)
@@ -168,6 +148,7 @@ namespace LibraryWebApp.Controllers
                 book.Authors.Add(author);
             }*/
 
+
             HttpResponseMessage res = await _client.PostAsJsonAsync(baseurl + "Books", book);
 
             if (!res.IsSuccessStatusCode)
@@ -183,6 +164,7 @@ namespace LibraryWebApp.Controllers
 
         // GET: Books/Delete/5
         // TODO: Create ViewModel for Delete from Book Details to Book Compressed
+        [Authorize(Roles = "Librarian,Administrator")]
         [Route("Books/Delete/{id}")]
         public async Task<IActionResult> Delete(long id)
         {
@@ -197,6 +179,7 @@ namespace LibraryWebApp.Controllers
         }
 
         // POST: Books/Delete/5
+        [Authorize(Roles = "Librarian,Administrator")]
         public async Task<IActionResult> DeleteConfirmed()
         {
             var bookIdString = Request.Form["BookId"];

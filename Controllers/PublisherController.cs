@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net.Http;
 using System.Net;
 using LibraryAPI.Resources;
+using Microsoft.AspNetCore.Authorization;
 
 namespace LibraryWebApp.Controllers
 {
@@ -53,6 +54,7 @@ namespace LibraryWebApp.Controllers
         }
 
         // GET: Publishers/Create
+        [Authorize(Roles = "Librarian,Administrator")]
         public IActionResult Create()
         {
             return View();
@@ -61,6 +63,7 @@ namespace LibraryWebApp.Controllers
         // POST: Publishers/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Librarian,Administrator")]
         public async Task<IActionResult> Add([Bind("PublisherId,Name")] PublisherResource publisher)
         {
             PublisherResource updatedPublisher = new PublisherResource();
@@ -81,6 +84,7 @@ namespace LibraryWebApp.Controllers
         }
 
         // GET: Publishers/Edit/5
+        [Authorize(Roles = "Librarian,Administrator")]
         public async Task<IActionResult> Edit([FromRoute]long id)
         {
             PublisherResource publisher = new PublisherResource();
@@ -102,6 +106,7 @@ namespace LibraryWebApp.Controllers
         // POST: Publishers/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Librarian,Administrator")]
         public async Task<IActionResult> Update([Bind("PublisherId,Name")] PublisherResource publisher)
         {
             //var json = JsonConvert.SerializeObject(publisher);
@@ -120,6 +125,7 @@ namespace LibraryWebApp.Controllers
         }
 
         // GET: Publishers/Delete/5
+        [Authorize(Roles = "Librarian,Administrator")]
         public async Task<HttpStatusCode> Delete([FromRoute]long id)
         {
             HttpResponseMessage res = await _client.DeleteAsync(baseurl + $"Publishers/{id}");

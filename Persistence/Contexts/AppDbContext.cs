@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace LibraryWebApp.Persistence.Contexts
 {
@@ -23,9 +25,13 @@ namespace LibraryWebApp.Persistence.Contexts
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<IdentityRole>().HasData(new IdentityRole { Name = "Admin", NormalizedName = "ADMIN" });
+
+
+            // Seed Roles
+            modelBuilder.Entity<IdentityRole>().HasData(new IdentityRole { Name = "Administrator", NormalizedName = "ADMINISTRATOR" });
             modelBuilder.Entity<IdentityRole>().HasData(new IdentityRole { Name = "Reader", NormalizedName = "READER" });
             modelBuilder.Entity<IdentityRole>().HasData(new IdentityRole { Name = "Librarian", NormalizedName = "LIBRARIAN" });
+
         }
     }
 }

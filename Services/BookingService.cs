@@ -6,7 +6,6 @@ using LibraryWebApp.Domain.Services.Communication;
 using System.Collections.Generic;
 using LibraryWebApp.Resources;
 using AutoMapper;
-using System.Net.Http;
 using System.Linq;
 
 namespace LibraryWebApp.Services
@@ -30,7 +29,7 @@ namespace LibraryWebApp.Services
             var bookings = await _bookingRepository.ListAsync();
 
             if (!bookings.Any() || bookings == null)
-                return new BookingResponse("There is no interested reader yet, \r\n they will start booking in no time :D .");
+                return new BookingResponse("There is no interested readers yet, \r\n they will start booking in no time :D .");
 
             var bookingsResource = _mapper.Map<IEnumerable<Booking>, IEnumerable<BookingResource>>(bookings);
 
@@ -140,18 +139,5 @@ namespace LibraryWebApp.Services
                 return new BookingResponse($"An error occurred when deleting the booking: {ex.Message}");
             }
         }
-
-        /*public async Task<BookResponse> GetBookingBooks(long id)
-        {
-            var booking = await _bookingRepository.GetBookingByIdAsync(id);
-
-            if (booking == null)
-                return new BookResponse("Booking not found.");
-
-            var bookingBooks = booking.Books;
-
-            return new BookResponse(bookingBooks);
-        }
-    }*/
     }
 }

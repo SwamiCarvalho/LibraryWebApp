@@ -1,8 +1,5 @@
-﻿using LibraryWebApp.Persistence.Contexts;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace LibraryWebApp.Persistence
 {
