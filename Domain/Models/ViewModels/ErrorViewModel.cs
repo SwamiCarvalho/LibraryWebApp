@@ -1,5 +1,5 @@
 
-namespace LibraryWebApp.Domain.Models
+namespace LibraryWebApp.Domain.Models.ViewModels
 {
     public class ErrorViewModel
     {

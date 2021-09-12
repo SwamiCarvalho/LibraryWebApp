@@ -1,4 +1,4 @@
-﻿using LibraryWebApp.Domain.Models;
+﻿using LibraryWebApp.Domain.Models.ViewModels;
 using LibraryWebApp.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;

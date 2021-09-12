@@ -1,14 +1,13 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using LibraryWebApp.Domain.Models;
 using LibraryWebApp.Resources;
 using LibraryWebApp.Services;
 using LibraryAPI.Resources;
 using LibraryWebApp.Domain.Services.Communication;
 using Microsoft.AspNetCore.Authorization;
-using LibraryAPI.Domain.Services;
 using System.Net.Http;
+using LibraryWebApp.Domain.Models.ViewModels;
 
 namespace LibraryWebApp.Controllers
 {

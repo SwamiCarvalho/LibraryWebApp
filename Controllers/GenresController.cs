@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net.Http;
 using LibraryAPI.Resources;
 using System;
-using LibraryWebApp.Domain.Models;
 using Microsoft.AspNetCore.Authorization;
+using LibraryWebApp.Domain.Models.ViewModels;
 
 namespace LibraryWebApp.Controllers
 {
