@@ -8,10 +8,13 @@
     <table class="table">
         <thead>
             <tr>
-                @if (!this.User.IsInRole("Reader"))
+                @if (this.User.IsInRole("Librarian") || this.User.IsInRole("Administrator"))
                 {
                     <th>
                         @Html.DisplayNameFor(booking => booking.BookingId)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(booking => booking.ReaderId)
                     </th>
                 }
 
@@ -35,37 +38,40 @@
         <tbody>
             @foreach (var booking in Model)
             {
-                <tr @booking.Status>
-                    @if (this.User.IsInRole("Librarian"))
-                    {
-                        <td>
-                            @Html.DisplayFor(modelItem => booking.BookingId)
-                        </td>
-                    }
+            <tr @booking.Status>
+                @if (this.User.IsInRole("Librarian") || this.User.IsInRole("Administrator"))
+                {
                     <td>
-                        @Html.DisplayFor(modelItem => booking.StartDate)
+                        @Html.DisplayFor(modelItem => booking.BookingId)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => booking.EndDate)
+                        @Html.DisplayFor(modelItem => booking.ReaderId)
                     </td>
-                    <td>
-                        <a asp-controller="Books" asp-action="Details" asp-route-id="@booking.BookId">@Html.DisplayFor(modelItem => booking.BookId)</a>
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => booking.Status)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => booking.DeliveryDate)
-                    </td>
+                }
+                <td>
+                    @Html.DisplayFor(modelItem => booking.StartDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => booking.EndDate)
+                </td>
+                <td>
+                    <a asp-controller="Books" asp-action="Details" asp-route-id="@booking.BookId">@Html.DisplayFor(modelItem => booking.BookId)</a>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => booking.Status)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => booking.DeliveryDate)
+                </td>
 
-                    <td>
-                        <a class="btn-warning" asp-action="Renew" asp-route-id="@booking.BookingId">Renew Booking</a>
-                        @if (!this.User.IsInRole("Reader"))
-                        {
-                            <a class="btn-danger" asp-action="Deliver" asp-route-id="@booking.BookingId">Deliver</a>
-                        }
-                    </td>
-                </tr>
+                <td>
+                    <a class="btn btn-warning" asp-action="Renew" asp-route-id="@booking.BookingId">Renew Booking</a>
+                    @if (this.User.IsInRole("Librarian") || this.User.IsInRole("Administrator"))
+                    {
+                        <a class=" btn btn-danger" asp-action="Deliver" asp-route-id="@booking.BookingId">Deliver</a>
+                    }
+                </td>
+            </tr>
             }
         </tbody>
     </table>

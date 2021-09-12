@@ -101,6 +101,8 @@ namespace LibraryWebApp.Services
             existingBooking.StartDate = bookingResource.StartDate;
             existingBooking.EndDate = bookingResource.EndDate;
             existingBooking.Status = bookingResource.Status;
+            if(bookingResource.DeliveryDate != null)
+                existingBooking.DeliveryDate = bookingResource.DeliveryDate;
 
             try
             {

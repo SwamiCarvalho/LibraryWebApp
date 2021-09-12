@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace LibraryWebApp.Resources
 {
@@ -13,7 +14,10 @@ namespace LibraryWebApp.Resources
         public DateTime EndDate { get; set; }
         public string Status { get; set; }
         public long BookId { get; set; }
+        public long ReaderId { get; set; }
+
         [DisplayName("Delivery Date")]
+        [DisplayFormat(NullDisplayText = "Not Delivered")]
         public DateTime? DeliveryDate { get; set; }
         // public virtual BookTitleResource Book { get; set; }
     }

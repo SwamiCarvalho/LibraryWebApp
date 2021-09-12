@@ -7,6 +7,8 @@ using LibraryWebApp.Services;
 using LibraryAPI.Resources;
 using LibraryWebApp.Domain.Services.Communication;
 using Microsoft.AspNetCore.Authorization;
+using LibraryAPI.Domain.Services;
+using System.Net.Http;
 
 namespace LibraryWebApp.Controllers
 {
@@ -15,34 +17,16 @@ namespace LibraryWebApp.Controllers
     {
         private readonly IBookingService _bookingService;
         public readonly IGeneralService _generalService;
+        private readonly HttpClient _client = new HttpClient();
 
-        public BookingsController(IBookingService bookingService, IGeneralService generalService)
+        const string baseurl = "https://localhost:44351/api/";
+
+        public BookingsController(IBookingService bookingService, IGeneralService generalService, HttpClient client)
         {
             _bookingService = bookingService;
             _generalService = generalService;
+            _client = client;
         }
-
-        // GET: All Bookings (For User Librarian)
-        /*[Route("Bookings")]
-        public async Task<IActionResult> Index()
-        {
-            //TODO: depending on the user 
-            ViewData["Title"] = "My Bookings";
-
-            var result = await _bookingService.GetAllBookingsAsync();
-            //var user = await _generalService.GetReader(this.User);
-            // Get all Bookings
-            //var result = await _bookingService.GetUserBookingsAsync(user.Reader.ReaderId);
-            //Check if it retrieved anything
-            if (!result.Success || result.Bookings == null)
-            {
-                ViewData["Feedback"] = result.Message;
-                View("Error", new ErrorViewModel());
-            }
-
-            //returning the bookings list to view controller
-            return View(result.Bookings);
-        }*/
 
         // GET: User Bookings (For User Reader)
         [Route("Bookings")]
@@ -127,14 +111,23 @@ namespace LibraryWebApp.Controllers
             // Check if it has been already delivered.
             if (result.Booking.Status == "Delivered")
             {
-                ViewData["FeedBack"] = "It was not possible to deliver book, due to, its no longer in your possesion.";
+                ViewData["FeedBack"] = "It was not possible to deliver book, due to, its has already been delivered.";
                 return View("Error", new ErrorViewModel());
             }
 
+            // Get Booking Book Name
+            HttpResponseMessage res = await _client.GetAsync(baseurl + $"Books/{result.Booking.BookId}");
+
+            if (!res.IsSuccessStatusCode)
+                return View("Error", new ErrorViewModel());
+
+            //Storing the response details received from web api   
+            var book = await res.Content.ReadAsAsync<BookResource>();
+            ViewBag.BookName = book.Title;
+
             // Set Status and Delivery Date.
-            DateTime? deliveryDate = DateTime.Now;
             result.Booking.Status = "Delivered";
-            result.Booking.DeliveryDate = deliveryDate;
+            result.Booking.DeliveryDate = DateTime.Now;
 
             return View(result.Booking);
         }
@@ -181,7 +174,6 @@ namespace LibraryWebApp.Controllers
             CreateBookingResource newBooking = new CreateBookingResource();
             newBooking.BookId = book.BookId;
             newBooking.Status = "Booked";
-            newBooking.DeliveryDate = null;
 
             var reader = await _generalService.GetReader(this.User);
 
