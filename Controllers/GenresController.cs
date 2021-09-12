@@ -3,8 +3,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Http;
 using LibraryAPI.Resources;
-using LibraryAPI.Domain.Models;
 using System;
+using LibraryWebApp.Domain.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace LibraryWebApp.Controllers
 {
@@ -55,6 +56,7 @@ namespace LibraryWebApp.Controllers
         }
 
         // GET: Genres/Edit/5
+        [Authorize(Roles = "Librarian,Administrator")]
         public async Task<IActionResult> Edit([FromRoute] long id)
         {
             HttpResponseMessage res = await _client.GetAsync(baseurl + $"Genres/{id}");
@@ -71,6 +73,7 @@ namespace LibraryWebApp.Controllers
         // POST: Genres/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Librarian,Administrator")]
         public async Task<IActionResult> Update([Bind("GenreId,Name")] GenreResource genre)
         {
             HttpResponseMessage res = await _client.PutAsJsonAsync(baseurl + $"Genres/{genre.GenreId}", genre);
@@ -83,6 +86,7 @@ namespace LibraryWebApp.Controllers
         }
 
         // GET: Genres/Create
+        [Authorize(Roles = "Librarian,Administrator")]
         public IActionResult Create()
         {
             return View();
@@ -91,6 +95,7 @@ namespace LibraryWebApp.Controllers
         // POST: Genres/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Librarian,Administrator")]
         public async Task<IActionResult> Add([Bind("Name")][FromForm] SaveGenreResource genre)
         {
             HttpResponseMessage res = await _client.PostAsJsonAsync(baseurl + "Genres", genre);
@@ -109,6 +114,7 @@ namespace LibraryWebApp.Controllers
 
         // GET: Genres/Delete/5
         [Route("Genres/Delete/{id}")]
+        [Authorize(Roles = "Librarian,Administrator")]
         public async Task<IActionResult> Delete([FromRoute]long id)
         {
             HttpResponseMessage genreRes = await _client.GetAsync(baseurl + $"Genres/{id}");
@@ -122,6 +128,7 @@ namespace LibraryWebApp.Controllers
         }
 
         // POST: Genres/Delete/5
+        [Authorize(Roles = "Librarian,Administrator")]
         public async Task<IActionResult> DeleteConfirmed()
         {
             var genreIdString = Request.Form["GenreId"];

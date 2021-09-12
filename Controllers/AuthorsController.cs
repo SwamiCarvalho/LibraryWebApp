@@ -1,5 +1,6 @@
-﻿using LibraryAPI.Domain.Models;
-using LibraryAPI.Resources;
+﻿using LibraryAPI.Resources;
+using LibraryWebApp.Domain.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -53,6 +54,7 @@ namespace LibraryWebApp.Controllers
 
 
         // GET: Authors/Edit/5
+        [Authorize(Roles = "Librarian,Administrator")]
         public async Task<IActionResult> Edit([FromRoute] long id)
         {
             HttpResponseMessage res = await _client.GetAsync(baseurl + $"Authors/{id}");
@@ -70,6 +72,7 @@ namespace LibraryWebApp.Controllers
         // POST: Authors/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Librarian,Administrator")]
         public async Task<IActionResult> Update([Bind("AuthorId,FirstName,LastName")] AuthorResource author)
         {
             HttpResponseMessage res = await _client.PutAsJsonAsync(baseurl + $"Authors/{author.AuthorId}", author);
@@ -77,15 +80,19 @@ namespace LibraryWebApp.Controllers
             if (!res.IsSuccessStatusCode)
                 return RedirectToAction(nameof(Edit), author.AuthorId);
 
+            TempData["message"] = String.Format("Author {} Successfully Updated.", author.FullName);
+
             //var updateAuthor = await res.Content.ReadAsAsync<AuthorResource>();
             return RedirectToAction("Details", new { id = author.AuthorId });
         }
 
+        [Authorize(Roles = "Librarian,Administrator")]
         public IActionResult Create()
         {
             return View();
         }
 
+        [Authorize(Roles = "Librarian,Administrator")]
         public async Task<IActionResult> Add([Bind("FirstName,LastName")] SaveAuthorResource author)
         {
             HttpResponseMessage res = await _client.PostAsJsonAsync(baseurl + "Authors", author);
@@ -96,11 +103,12 @@ namespace LibraryWebApp.Controllers
                 return RedirectToAction("Error", new ErrorViewModel());
             }
                 
-            var newAuthor = await res.Content.ReadAsAsync<Author>();
+            var newAuthor = await res.Content.ReadAsAsync<AuthorResource>();
             return RedirectToAction(nameof(Details), new { id = newAuthor.AuthorId });
             //return CreatedAtRoute("DefaultApi", new { id = author.Id }, dto);
         }
 
+        [Authorize(Roles = "Librarian,Administrator")]
         [Route("Authors/Delete/{id}")]
         public async Task<IActionResult> Delete([FromRoute]long id)
         {
@@ -109,11 +117,12 @@ namespace LibraryWebApp.Controllers
             if (!authorRes.IsSuccessStatusCode)
                 return View("Error", new ErrorViewModel());
 
-            // Deserialize the updated product from the response body.
+            // Deserialize the updated author from the response body.
             var author = await authorRes.Content.ReadAsAsync<AuthorResource>();
             return View(author);
         }
 
+        [Authorize(Roles = "Librarian,Administrator")]
         // POST: Authors/Delete/5
         public async Task<IActionResult> DeleteConfirmed()
         {
@@ -127,6 +136,10 @@ namespace LibraryWebApp.Controllers
                 ViewData["Feedback"] = "Sorry, author wasn't Deleted";
                 return View("Error", new ErrorViewModel());
             }
+
+            // Deserialize the deleted author from the response body.
+            var author = await res.Content.ReadAsAsync<AuthorResource>();
+            TempData["message"] = String.Format("Author {} Successfully Updated.", author.FullName);
 
             return RedirectToAction(nameof(Index));
         }

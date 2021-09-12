@@ -2,23 +2,29 @@
 
 <h1>@ViewData["Title"]</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-
-<ul>
-    @foreach (var item in Model)
-    {
-        <li>
-            <p> 
-                <a asp-action="Details" asp-route-id="@item.GenreId"> @Html.DisplayFor(modelItem => item.Name)</a>
-                <span><a class="btn btn-primary btn-warning" asp-action="Edit" asp-route-id="@item.GenreId">Edit</a></span>
-                <span><a class="btn btn-primary btn-danger" asp-action="Delete" asp-route-id="@item.GenreId">Delete</a></span>
-            </p>
-        </li>
-    }
-</ul>
-@if (TempData["message"] != null)
+@if (this.User.IsInRole("Librarian") || this.User.IsInRole("Administrator"))
 {
-    <script>alert('@TempData["message"]');</script>
+    <p>
+        <a asp-action="Create">Create New</a>
+    </p>
 }
+
+    <ul>
+        @foreach (var item in Model)
+        {
+            <li>
+                <p>
+                    <a asp-action="Details" asp-route-id="@item.GenreId"> @Html.DisplayFor(modelItem => item.Name)</a>
+                    @if (this.User.IsInRole("Librarian") || this.User.IsInRole("Administrator"))
+                    {
+                        <span><a class="btn btn-primary btn-warning" asp-action="Edit" asp-route-id="@item.GenreId">Edit</a></span>
+                        <span><a class="btn btn-primary btn-danger" asp-action="Delete" asp-route-id="@item.GenreId">Delete</a></span>
+                    }
+                </p>
+            </li>
+        }
+    </ul>
+    @if (TempData["message"] != null)
+    {
+        <script>alert('@TempData["message"]');</script>
+    }

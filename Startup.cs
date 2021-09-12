@@ -1,5 +1,4 @@
 using LibraryWebApp.Domain.Repositories;
-using LibraryWebApp.Persistence;
 using LibraryWebApp.Persistence.Contexts;
 using LibraryWebApp.Persistence.Repositories;
 using LibraryWebApp.Services;
@@ -65,19 +64,21 @@ namespace LibraryWebApp
                 options.SignIn.RequireConfirmedPhoneNumber = false;
             });
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Latest)
-                    .AddRazorPagesOptions(options =>
+            services.AddRazorPages(options =>
                     {
                         options.Conventions.AuthorizeAreaFolder("Identity", "/Account/Manage");
                         options.Conventions.AuthorizeAreaPage("Identity", "/Account/Logout");
+                        options.Conventions.AuthorizeFolder("/Bookings");
+                        options.Conventions.AuthorizeFolder("/Role");
                     });
 
-            /*services.ConfigureApplicationCookie(options =>
+            services.ConfigureApplicationCookie(options =>
             {
                 options.LoginPath = $"/Identity/Account/Login";
                 options.LogoutPath = $"/Identity/Account/Logout";
                 options.AccessDeniedPath = $"/Identity/Account/AccessDenied";
-            });*/
+            });
+
 
             // Repository Services 
             services.AddScoped<IBookingRepository, BookingRepository>();
@@ -91,6 +92,12 @@ namespace LibraryWebApp
             services.AddScoped<ILibrarianService, LibrarianService>();
             services.AddScoped<IReaderService, ReaderService>();
             services.AddScoped<IGeneralService, GeneralService>();
+
+            // Ideal to have Services that make requests to API, applying HTTPClientFactory.
+            /*//Add http client services at ConfigureServices(IServiceCollection services)
+            services.AddHttpClient<ICatalogService, CatalogService>();
+            services.AddHttpClient<IBasketService, BasketService>();
+            services.AddHttpClient<IOrderingService, OrderingService>();*/
 
             // Automapper Service
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());

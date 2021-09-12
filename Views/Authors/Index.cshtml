@@ -6,9 +6,13 @@
 
 <h1>@ViewData["Title"]</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+@if (this.User.IsInRole("Librarian") || this.User.IsInRole("Administrator"))
+{
+    <p>
+        <a asp-action="Create">Create New</a>
+    </p>
+}
+
 
 <ul>
     @foreach (var item in Model)
@@ -16,8 +20,11 @@
         <li>
             <p>
                 <a asp-action="Details" asp-route-id="@item.AuthorId"> @Html.DisplayFor(modelItem => item.FullName)</a>
-                <span><a class="btn btn-primary btn-warning" asp-action="Edit" asp-route-id="@item.AuthorId">Edit</a></span>
-                <span><a class="btn btn-primary btn-danger" asp-action="Delete" asp-route-id="@item.AuthorId">Delete</a></span>
+                @if (this.User.IsInRole("Librarian") || this.User.IsInRole("Administrator"))
+                {
+                    <span><a class="btn btn-primary btn-warning" asp-action="Edit" asp-route-id="@item.AuthorId">Edit</a></span>
+                    <span><a class="btn btn-primary btn-danger" asp-action="Delete" asp-route-id="@item.AuthorId">Delete</a></span>
+                }
             </p>
         </li>
     }

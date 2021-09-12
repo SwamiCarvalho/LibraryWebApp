@@ -29,7 +29,6 @@ namespace LibraryWebApp.Domain.Models
         private readonly IEmailSender _emailSender;
         private readonly IReaderService _readerService;
         private readonly ILibrarianService _librarianService;
-        private readonly IMapper _mapper;
 
         public RegisterModel(
             UserManager<IdentityUser> userManager,
@@ -46,7 +45,6 @@ namespace LibraryWebApp.Domain.Models
             _emailSender = emailSender;
             _readerService = readerService;
             _librarianService = librarianService;
-            _mapper = mapper;
         }
 
         [BindProperty]
@@ -57,18 +55,6 @@ namespace LibraryWebApp.Domain.Models
         public IList<AuthenticationScheme> ExternalLogins { get; set; }
 
         public string[] Roles { get; set; }
-   /*     public bool LibCodeRequired { get { return LibCodeRequiredContition(); } }
-
-        public bool LibCodeRequiredContition()
-        {
-            string role = Input.Role;
-            string observedLibCode = Input.LibrarianCode;
-            string expectedLibCode = Utility.SecretCodes.LibCode;
-            if (role == "Librarian" & observedLibCode == expectedLibCode)
-                return true;
-            else
-                return false;
-        }*/
 
 
         public class InputModel

@@ -37,8 +37,8 @@ namespace LibraryWebApp.Services
                 return new RoleResponse("You don't have any Role.");
 
             var userRoles = await _userManager.GetRolesAsync(user);
-
-            return new RoleResponse(userRoles);
+            var userRole = userRoles[0];
+            return new RoleResponse(userRole, true);
         }
 
         public async Task<RoleResponse> CheckRoleExistence(string roleName)

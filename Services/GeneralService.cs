@@ -45,7 +45,7 @@ namespace LibraryWebApp.Services
                 if (!result.Success)
                     return new RoleResponse("An error occurred when trying to retrieve the roles from the authenticated user.");
 
-                return new RoleResponse(result.RolesIList);
+                return new RoleResponse(result.RoleString, true);
             }
             return new RoleResponse("You are not logged in, so we can't see your role.");
 
