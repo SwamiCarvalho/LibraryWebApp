@@ -64,7 +64,8 @@ namespace LibraryWebApp
                 options.SignIn.RequireConfirmedPhoneNumber = false;
             });
 
-            services.AddRazorPages(options =>
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Latest)
+                    .AddRazorPagesOptions(options =>
                     {
                         options.Conventions.AuthorizeAreaFolder("Identity", "/Account/Manage");
                         options.Conventions.AuthorizeAreaPage("Identity", "/Account/Logout");

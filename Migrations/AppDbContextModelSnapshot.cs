@@ -148,22 +148,22 @@ namespace LibraryWebApp.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "4285f7a7-5fd8-46c2-8638-91924362b310",
-                            ConcurrencyStamp = "a336a14f-8f5e-409e-9185-7be03b85d2f2",
-                            Name = "Admin",
-                            NormalizedName = "ADMIN"
+                            Id = "382c829c-1bbc-4827-84ba-a317e4b475cc",
+                            ConcurrencyStamp = "ab254421-6756-47c7-bd15-142e4c749772",
+                            Name = "Administrator",
+                            NormalizedName = "ADMINISTRATOR"
                         },
                         new
                         {
-                            Id = "e90d7bdd-f3c8-4c67-af10-f0035a76ddb1",
-                            ConcurrencyStamp = "d460cfb8-0552-433f-bb20-13ed3254759f",
+                            Id = "5b54b1f4-c872-46cf-8734-8919ac3f6a80",
+                            ConcurrencyStamp = "814ec227-5994-4938-8d61-afafc867f31c",
                             Name = "Reader",
                             NormalizedName = "READER"
                         },
                         new
                         {
-                            Id = "28aeb7d6-4332-4f24-8253-55b9bea4c63e",
-                            ConcurrencyStamp = "d72c6073-b000-499b-abc6-0c4c9af16c63",
+                            Id = "39c292df-fd01-406a-9962-ed5581a0d09a",
+                            ConcurrencyStamp = "d3515283-447d-42ad-b2e0-777d092cc248",
                             Name = "Librarian",
                             NormalizedName = "LIBRARIAN"
                         });

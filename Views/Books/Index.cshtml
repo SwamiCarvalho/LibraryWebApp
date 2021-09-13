@@ -18,7 +18,7 @@
 @if (this.User.IsInRole("Librarian") || this.User.IsInRole("Administrator"))
 {
     <p>
-        <a asp-action="Create">Create New</a>
+        <a asp-controller="Books" asp-action="Create">Create New</a>
     </p>
 }
 

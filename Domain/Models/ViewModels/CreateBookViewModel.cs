@@ -20,7 +20,7 @@ namespace LibraryWebApp.Domain.Models.ViewModels
 
         const string baseurl = "https://localhost:44351/api/";
 
-        public CreateBookViewModel(HttpClient client) 
+        public CreateBookViewModel(HttpClient client)
         {
             _client = client;
         }
@@ -62,7 +62,7 @@ namespace LibraryWebApp.Domain.Models.ViewModels
 
             GenresOptions = new SelectList(genres, nameof(GenreResource.GenreId), nameof(GenreResource.Name));
             AuthorsOptions = new SelectList(authors, nameof(AuthorResource.AuthorId), nameof(AuthorResource.FullName));
-            
+
         }
 
         public async Task<List<SelectListItem>> GetGenres()
@@ -94,5 +94,43 @@ namespace LibraryWebApp.Domain.Models.ViewModels
             }).ToList();
             return authorOptions;
         }
+
+        /*public async Task<IActionResult> OnPostAsync(string returnUrl = null)
+        {
+            returnUrl ??= Url.Content("~/");
+            if (ModelState.IsValid)
+            {
+                var book = new SaveBookResource
+                {
+                    Title = Input.Title,
+                    OgTitle = Input.OgTitle,
+                    Notes = Input.Notes,
+                    Edition = Input.Edition,
+                    PhysicalDescription = Input.PhysicalDescription,
+                    PublicationYear = Input.PublicationYear
+                };
+
+                foreach (var genreIdString in Input.Genres)
+                {
+                    var idLong = Convert.ToInt64(genreIdString);
+                    HttpResponseMessage res = await _client.GetAsync(baseurl + $"Genres/{idLong}");
+                    var genre = await res.Content.ReadAsAsync<GenreResource>();
+                    book.Genres.Add(genre);
+                }
+
+                foreach (var authorIdString in Input.Authors)
+                {
+                    var idLong = Convert.ToInt64(authorIdString);
+                    HttpResponseMessage res = await _client.GetAsync(baseurl + $"Authors/{idLong}");
+                    var author = await res.Content.ReadAsAsync<AuthorResource>();
+                    book.Authors.Add(author);
+                }
+
+                return RedirectToAction("Add", book);
+            }
+
+            // If we got this far, something failed, redisplay form
+            return RedirectToPage("Create");
+        }*/
     }
 }

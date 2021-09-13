@@ -84,7 +84,7 @@
 
             </dd>
         </dl>
-        @if (this.User.IsInRole("Librarian") || this.User.IsInRole("Administrator"))
+        @if (this.User.Identity.IsAuthenticated)
         {
             <input type="submit" value="Book" class="btn btn-primary btn-toolbar" />
          }

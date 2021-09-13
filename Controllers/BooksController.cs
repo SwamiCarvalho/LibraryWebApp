@@ -110,9 +110,35 @@ namespace LibraryWebApp.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [Authorize(Roles = "Librarian,Administrator")]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            ViewData["Title"] = "Create";
+            ViewBag.Create = "Create Book";
+
+            //////////////////////// GET GENRE NAMES TO POPULATE DROPDOWN LIST ///////////////////////////////////////
+
+            //Sending request to find web api REST service resource GetAllGenres using HttpClient  
+            HttpResponseMessage genresRes = await _client.GetAsync(baseurl + "Genres");
+
+            //Checking the response is successful or not which is sent using HttpClient  
+            if (genresRes.IsSuccessStatusCode)
+            {
+                //Storing the response details received from web api   
+                var genres = await genresRes.Content.ReadAsAsync<List<GenreResource>>();
+                ViewBag.GenresList = genres;
+            }
+
+            //////////////////////// GET AUTHOR NAMES TO POPULATE DROPDOWN LIST ///////////////////////////////////////
+
+            //Sending request to find web api REST service resource GetAllAuthors using HttpClient  
+            HttpResponseMessage authorsRes = await _client.GetAsync(baseurl + "Authors");
+
+            //Checking the response is successful or not which is sent using HttpClient  
+            if (authorsRes.IsSuccessStatusCode)
+            {
+                //Storing the response details received from web api   
+                var authors = await authorsRes.Content.ReadAsAsync<List<AuthorResource>>();
+                ViewBag.AuthorsList = authors;
+            }
 
             return View();
         }
